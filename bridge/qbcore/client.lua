@@ -12,9 +12,17 @@ function ClNotify(msg, type)
     end
 end
 
+function ClJobCheck()
+    local PlayerData = QBCore.Functions.GetPlayerData()
+    return (PlayerData.job.name == "police")
+end
+
 function ClInvCheck()
     for k, v in pairs(Cfg.Drugs) do
         Item = QBCore.Functions.HasItem(k)
         print(json.encode(Item))
+        if Item == nil then
+            return
+        end
     end
 end

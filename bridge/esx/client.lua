@@ -12,12 +12,25 @@ function ClNotify(msg, type)
     end
 end
 
-function ClInvCheck()
-    local data = {}
-    for k, v in pairs(Cfg.Drugs) do
-        Item = ESX.SearchInventory(k)
-        -- print(json.encode(Item))
-        data.item = Item.name
-        print(data.item)
+function ClJobCheck()
+    local job = ESX.GetPlayerData().job
+    return (job.name == "police")
+end
+
+function ClInvCheck(item)
+    if not item then
+        for k, v in pairs(Cfg.Drugs) do
+            Item = ESX.SearchInventory(k)
+            if Item ~= nil then
+                GetData(Item["name"], Item["label"], Item["count"])
+                return true
+            end
+        end
+    else
+        Item = ESX.SearchInventory(item)
+        if Item ~= nil then
+            GetData(Item["name"], Item["label"], Item["count"])
+            return true
+        end
     end
 end

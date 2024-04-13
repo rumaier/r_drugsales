@@ -23,12 +23,23 @@ function SvAddMoney(src, amount)
     xPlayer.addMoney(amount)
 end
 
-RegisterNetEvent('r_drugsales:invcheck')
-AddEventHandler('r_drugsales:invcheck', function()
+function SvRemoveItem(src, item, qty)
+    local xPlayer = ESX.GetPlayerFromId(src)
+    xPlayer.removeInventoryItem(item, qty)
+end
+
+function SvInvCheck(item)
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
-    for k, v in pairs(Cfg.Drugs) do
-        Item = xPlayer.getInventoryItem(k)
+    local item = xPlayer.getInventoryItem(item)
+    if item["stack"] then
+        return item
     end
-    return Item
-end)
+end
+
+if Cfg.Interaction == 'item' then
+    ESX.RegisterUsableItem('r_trapphone', function(source)
+        local src = source
+        TriggerClientEvent('r_drugsales:openDealerMenu', src)
+    end)
+end

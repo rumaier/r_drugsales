@@ -1,0 +1,6 @@
+['r_trapphone'] = {
+    label = 'Trap Phone',
+    weight = 35,
+    stack = false,
+    close = true,
+}
