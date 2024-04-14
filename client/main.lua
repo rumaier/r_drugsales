@@ -53,16 +53,22 @@ local function getPaid(type)
     local cCoords = GetEntityCoords(custy.current)
     local coordData = { pCoords, cCoords }
     if type == 'bulk' then
+        local qty = nil
         drugData.pay = math.random(Cfg.Drugs[drugData.drug].Bulk.Min, Cfg.Drugs[drugData.drug].Bulk.Max)
+        if drugData.qty < Cfg.BulkSale.Max then
+            qty = math.random(1, drugData.qty)
+        else
+            qty = math.random(1, Cfg.BulkSale.Max)
+        end
         RollOdds()
-        TriggerServerEvent('r_drugsales:dataCheck', coordData, drugData, 1000)
+        TriggerServerEvent('r_drugsales:dataCheck', coordData, drugData, qty)
     elseif type == 'street' then
         local qty = nil
         drugData.pay = math.random(Cfg.Drugs[drugData.drug].Street.Min, Cfg.Drugs[drugData.drug].Street.Max)
-        if drugData.qty < Cfg.MaxSale then
+        if drugData.qty < Cfg.StreetSale.Max then
             qty = math.random(1, drugData.qty)
         else
-            qty = math.random(1, Cfg.MaxSale)
+            qty = math.random(1, Cfg.StreetSale.Max)
         end
         RollOdds()
         TriggerServerEvent('r_drugsales:dataCheck', coordData, drugData, qty)
@@ -308,7 +314,7 @@ local function bulkSale()
     local pedModel = Cfg.BulkPeds[math.random(1, #Cfg.BulkPeds)]
     local phoneProp = 'prop_phone_ing'
     local animDict = 'cellphone@'
-    if not ClInvCheck() or drugData.qty < 1000 then
+    if not ClInvCheck() or drugData.qty < Cfg.BulkSale.Min then
         PlaySound(-1, 'Click_Fail', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
         ClNotify('You don\'t have enough drugs to sell.', 'error')
         ClearPedTasks(player)

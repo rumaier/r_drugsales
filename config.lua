@@ -30,10 +30,10 @@ Cfg = {
     },
 
     StreetSelling = 'pool',                -- Determines the street selling method. ('pool': grabs nearest NPC, 'spawn': spawns a ped 20 units away.)
-    PedFrequency = { Min = 15, Max = 20 }, -- Determines how many seconds between either a ped is grabbed or spawned.
     PoolDistance = 100,                    -- Determines the distance it will pull peds from when in StreetSelling = 'pool'. Wouldn't recommend going over 100.
-    MaxSale = 3,                           -- Determines the max amount of drugs sold per street sale.
-    BulkMin = 1000,                        -- Determines the minimum amount needed for a bulk sale.
+    PedFrequency = { Min = 15, Max = 20 }, -- Determines how many seconds between either a ped is grabbed or spawned.
+    StreetSale = { Min = 1, Max = 5 },     -- Determines the max amount of drugs sold per street sale.
+    BulkSale = { Min = 750, Max = 1000 },  -- Determines the minimum amount needed for a bulk sale.
 
     MeetupCoords = {                       -- Determines where the ped will spawn when meeting for bulk sales. Can add as many as you like.
         vec4(201.06, -2000.82, 17.86, 230.26),

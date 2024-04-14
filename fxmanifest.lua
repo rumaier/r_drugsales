@@ -6,7 +6,7 @@ lua54 'yes'
 name 'r_drugsales'
 description 'A Drug Selling System'
 author 'r_scripts'
-version '0.9.6'
+version '0.9.7'
 
 shared_scripts {
     '@es_extended/imports.lua',
