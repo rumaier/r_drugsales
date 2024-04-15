@@ -56,21 +56,21 @@ local function getPaid(type)
         local qty = nil
         drugData.pay = math.random(Cfg.Drugs[drugData.drug].Bulk.Min, Cfg.Drugs[drugData.drug].Bulk.Max)
         if drugData.qty < Cfg.BulkSale.Max then
-            qty = math.random(1, drugData.qty)
+            qty = math.random(Cfg.BulkSale.Min, drugData.qty)
         else
-            qty = math.random(1, Cfg.BulkSale.Max)
+            qty = math.random(Cfg.BulkSale.Min, Cfg.BulkSale.Max)
         end
-        RollOdds()
+        TriggerServerEvent('r_drugsales:rollOdds', true)
         TriggerServerEvent('r_drugsales:dataCheck', coordData, drugData, qty)
     elseif type == 'street' then
         local qty = nil
         drugData.pay = math.random(Cfg.Drugs[drugData.drug].Street.Min, Cfg.Drugs[drugData.drug].Street.Max)
         if drugData.qty < Cfg.StreetSale.Max then
-            qty = math.random(1, drugData.qty)
+            qty = math.random(Cfg.StreetSale.Min, drugData.qty)
         else
-            qty = math.random(1, Cfg.StreetSale.Max)
+            qty = math.random(Cfg.StreetSale.Min, Cfg.StreetSale.Max)
         end
-        RollOdds()
+        TriggerServerEvent('r_drugsales:rollOdds', true)
         TriggerServerEvent('r_drugsales:dataCheck', coordData, drugData, qty)
         ClInvCheck()
     end
@@ -79,7 +79,7 @@ end
 local function getRejected()
     PlayPedAmbientSpeechNative(custy.current, 'GENERIC_INSULT_HIGH', 'SPEECH_PARAMS_FORCE')
     if Cfg.NotifyPoliceOnReject then
-        NotifyPolice()
+        TriggerServerEvent('r_drugsales:rollOdds', false)
     end
     ClNotify('I don\'t want this bulls***!', 'error')
     TaskWanderStandard(custy.current, 10.0, 10)
@@ -175,7 +175,7 @@ local function poolStreetSale()
             local cCoords = GetEntityCoords(custy.current)
             local distance = #(pCoords - cCoords)
             while distance > 1.4 and custy.current do
-                TaskGoToCoordAnyMeans(custy.current, pCoords.x + (forwardCoords.x * 1.3), pCoords.y + (forwardCoords.y * 1.3), pCoords.z, 1.0, 0, false, 786603, 0xbf800000)
+                TaskGoToCoordAnyMeans(custy.current, pCoords.x + (forwardCoords.x * 1.3), pCoords.y + (forwardCoords.y * 1.3), pCoords.z, 1.2, 0, false, 786603, 0xbf800000)
                 cCoords = GetEntityCoords(custy.current)
                 pCoords = GetEntityCoords(player)
                 distance = #(pCoords - cCoords)
@@ -254,7 +254,7 @@ local function spawnStreetSale()
     ClNotify('Stay here and wait for customers.', 'info')
     while isBusy do
         if custy.current and isBusy then
-            TaskGoToEntity(custy.current, player, -1, 1.0, 1.5, 1073741824, 0)
+            TaskGoToEntity(custy.current, player, -1, 1.2, 1.0, 1073741824, 0)
             ClInvCheck()
         end
         if not custy.current and ClInvCheck() then
