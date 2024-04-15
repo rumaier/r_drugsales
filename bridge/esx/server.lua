@@ -4,7 +4,7 @@ print('Current Framework: ESX')
 local ESX = exports["es_extended"]:getSharedObject()
 
 function SvNotify(msg, type)
-    local src = source    
+    local src = source
     if Cfg.Notification == 'default' then
         TriggerClientEvent('esx:showNotification', src, msg, type)
     elseif Cfg.Notification == 'ox' then
@@ -20,7 +20,11 @@ function SvAddMoney(src, amount)
         print(src, " Is A Cheater")
         return
     end
-    xPlayer.addMoney(amount)
+    if Cfg.Account == 'money' then
+        xPlayer.addMoney(amount)
+    else
+        xPlayer.setAccountMoney(Cfg.Account, amount)
+    end
 end
 
 function SvRemoveItem(src, item, qty)
@@ -36,6 +40,17 @@ function SvInvCheck(item)
         return item
     end
 end
+
+lib.callback.register('r_drugsales:getCopsOnline', function()
+    local cops = 0
+    for k, v in pairs(ESX.GetPlayers()) do
+        local xPlayer = ESX.GetPlayerFromId(v)
+        if xPlayer.job.name == 'police' then
+            cops = cops + 1
+        end
+    end
+    return cops
+end)
 
 if Cfg.Interaction == 'item' then
     ESX.RegisterUsableItem('r_trapphone', function(source)

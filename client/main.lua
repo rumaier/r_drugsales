@@ -76,13 +76,33 @@ local function getPaid(type)
     end
 end
 
+local function getRejected()
+    PlayPedAmbientSpeechNative(custy.current, 'GENERIC_INSULT_HIGH', 'SPEECH_PARAMS_FORCE')
+    if Cfg.NotifyPoliceOnReject then
+        NotifyPolice()
+    end
+    ClNotify('I don\'t want this bulls***!', 'error')
+    TaskWanderStandard(custy.current, 10.0, 10)
+    RemovePedElegantly(custy.current)
+    SetModelAsNoLongerNeeded(bagModel)
+    SetModelAsNoLongerNeeded(cashModel)
+    ox_target:removeLocalEntity(custy.current)
+    custy.last = custy.current
+    custy.current = nil
+end
+
 local function streetSell()
     local dead = IsEntityDead(custy.current)
+    local odds = math.random(100)
     if dead then
         ClNotify('You can\'t sell to a dead person.', 'error')
         DeleteEntity(custy.current)
         custy.last = custy.current
         custy.current = nil
+        return
+    end
+    if odds < Cfg.RejectChance then
+        getRejected()
         return
     end
     local player = PlayerPedId()
@@ -110,6 +130,7 @@ local function streetSell()
     DeleteEntity(cash)
     getPaid('street')
     Wait(100)
+    PlayPedAmbientSpeechNative(custy.current, 'GENERIC_THANKS', 'SPEECH_PARAMS_STANDARD')
     TaskWanderStandard(custy.current, 10.0, 10)
     RemovePedElegantly(custy.current)
     SetModelAsNoLongerNeeded(bagModel)
@@ -154,7 +175,7 @@ local function poolStreetSale()
             local cCoords = GetEntityCoords(custy.current)
             local distance = #(pCoords - cCoords)
             while distance > 1.4 and custy.current do
-                TaskGoToCoordAnyMeans(custy.current, pCoords.x + (forwardCoords.x * 1.3), pCoords.y + (forwardCoords.y * 1.3), pCoords.z, 1.5, 0, false, 786603, 0xbf800000)
+                TaskGoToCoordAnyMeans(custy.current, pCoords.x + (forwardCoords.x * 1.3), pCoords.y + (forwardCoords.y * 1.3), pCoords.z, 1.0, 0, false, 786603, 0xbf800000)
                 cCoords = GetEntityCoords(custy.current)
                 pCoords = GetEntityCoords(player)
                 distance = #(pCoords - cCoords)
@@ -179,8 +200,8 @@ local function poolStreetSale()
                     icon = 'fas fa-cannabis',
                     distance = 1.5,
                     onSelect = function()
-                        TaskTurnPedToFaceEntity(player, custy.current, 1000)
-                        Wait(1000)
+                        TaskTurnPedToFaceEntity(player, custy.current, 500)
+                        Wait(500)
                         streetSell()
                     end
                 },
@@ -241,7 +262,7 @@ local function spawnStreetSale()
             lib.requestModel(PedModel, 100)
             Wait(math.random(10000, 15000))
             if isBusy then
-                custy.current = CreatePed(0, PedModel, coords.x + (forwardCoords.x * 20), coords.y + (forwardCoords.y * 20), coords.z, heading - 180.0, false, true)
+                custy.current = CreatePed(0, PedModel, coords.x + (forwardCoords.x * 20), coords.y + (forwardCoords.y * 20), coords.z, heading - 180.0, true, true)
                 ox_target:addLocalEntity(custy.current, {
                     {
                         label = 'Sell ' .. drugData.label .. '',
@@ -332,7 +353,7 @@ local function bulkSale()
     AttachEntityToEntity(phone, player, GetPedBoneIndex(player, 28422), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
     Wait(5000)
     PlaySound(-1, 'Hang_Up', 'Phone_SoundSet_Michael', false, 0, true)
-    custy.current = CreatePed(0, pedModel, meetup.x, meetup.y, meetup.z, meetup.w, false, true)
+    custy.current = CreatePed(0, pedModel, meetup.x, meetup.y, meetup.z, meetup.w, true, true)
     SetEntityInvincible(custy.current, true)
     FreezeEntityPosition(custy.current, true)
     SetBlockingOfNonTemporaryEvents(custy.current, true)
@@ -434,6 +455,7 @@ end)
 RegisterNetEvent('r_drugsales:openDealerMenu')
 AddEventHandler('r_drugsales:openDealerMenu', function()
     local cop = ClJobCheck()
+    local copcount = lib.callback.await('r_drugsales:getCopsOnline', false)
     if cop then
         ClNotify('Nice try narc!', 'error')
         return
@@ -442,8 +464,13 @@ AddEventHandler('r_drugsales:openDealerMenu', function()
         ClNotify('You are already selling!', 'error')
         return
     end
+    if copcount < Cfg.MinPolice then
+        ClNotify('There aren\'t enough police on duty!', 'error')
+        return
+    end
     OpenDealerMenu()
 end)
+
 
 if Cfg.Interaction == 'command' then
     RegisterCommand('dealer', function()

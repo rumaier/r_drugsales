@@ -7,10 +7,10 @@
 Cfg = {
     -- Server options
     Notification = 'default', -- Determines the notification system. ('default', 'ox', 'custom': can be customized in bridge/"FRAMEWORK")
-    Interaction = 'item',     -- Determines how players will open the Dealer Menu. ('item' or 'command')
+    Interaction = 'item',     -- Determines how players will open the Dealer Menu. ('item' or 'command') MUST HAVE ITEM INSTALLED FOR 'item'!!
 
     -- Dispatch Options
-    Dispatch = 'linden_outlawalert', -- Determines your dispatch system. ('linden_outlawalert', 'cd_dispatch', 'rcore_dispatch', 'core_dispatch', 'custom': can be customized in bridge/dispatch. false to disable. )
+    Dispatch = 'linden_outlawalert', -- Determines the dispatch system. ('linden_outlawalert', 'cd_dispatch', 'rcore_dispatch', 'core_dispatch', 'custom': can be customized in bridge/dispatch. false to disable. )
     ReportOdds = 10,                 -- Determines the percentage chance of the police being notified when a sale occurs. (Default: 10)
 
     -- Selling Options
@@ -29,11 +29,15 @@ Cfg = {
         }
     },
 
+    MinPolice = 1,                         -- Determines the minimum amount of police for players to sell. Set to 0 to disable.
+    Account = 'black_money',               -- Determines the account players will be paid to upon sale.
     StreetSelling = 'pool',                -- Determines the street selling method. ('pool': grabs nearest NPC, 'spawn': spawns a ped 20 units away.)
     PoolDistance = 100,                    -- Determines the distance it will pull peds from when in StreetSelling = 'pool'. Wouldn't recommend going over 100.
     PedFrequency = { Min = 15, Max = 20 }, -- Determines how many seconds between either a ped is grabbed or spawned.
     StreetSale = { Min = 1, Max = 5 },     -- Determines the max amount of drugs sold per street sale.
     BulkSale = { Min = 750, Max = 1000 },  -- Determines the minimum amount needed for a bulk sale.
+    RejectChance = 10,                     -- Determines the percentage chance a customer will reject whatever drug you have when street selling.
+    NotifyPoliceOnReject = true,           -- Determines if the police will be notified upon a rejected sale.
 
     MeetupCoords = {                       -- Determines where the ped will spawn when meeting for bulk sales. Can add as many as you like.
         vec4(201.06, -2000.82, 17.86, 230.26),

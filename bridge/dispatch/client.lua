@@ -1,6 +1,6 @@
 if not Cfg.Dispatch then return end
 
-local function NotifyPolice()
+function NotifyPolice()
     if Cfg.Dispatch == 'linden_outlawalert' then
         local player = PlayerPedId()
         local coords = GetEntityCoords(player)
