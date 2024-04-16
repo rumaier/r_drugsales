@@ -11,7 +11,7 @@ AddEventHandler('r_drugsales:notifyPolice', function()
                 displayCode = '10-17',
                 description = 'Suspicious Person',
                 isImportant = 0,
-                recipientList = { 'police' },
+                recipientList = Cfg.PoliceJobs,
                 length = '10000',
                 infoM = 'fa-info-circle',
                 info = 'Possible Narcotics Distrubution'
@@ -21,7 +21,7 @@ AddEventHandler('r_drugsales:notifyPolice', function()
         elseif Cfg.Dispatch == 'cd_dispatch' then
             local data = exports['cd_dispatch']:GetPlayerInfo()
             TriggerServerEvent('cd_dispatch:AddNotification', {
-                job_table = { 'police', },
+                job_table = Cfg.PoliceJobs,
                 coords = data.coords,
                 title = '10-17 - Suspicious Person',
                 message = 'A ' .. data.sex .. ' is dealing narcotics at ' .. data.street,
@@ -47,7 +47,7 @@ AddEventHandler('r_drugsales:notifyPolice', function()
                 code = '10-17 - Suspicious Person',
                 default_priority = 'low',
                 coords = player_data.coords,
-                job = 'police',
+                job = Cfg.PoliceJobs,
                 text = text,
                 type = 'alerts',
                 blip_time = 5,
@@ -64,7 +64,7 @@ AddEventHandler('r_drugsales:notifyPolice', function()
             local player = PlayerPedId()
             local coords = GetEntityCoords(player)
             exports['core_dispatch']:addCall("10-17", "Suspicious Person",
-                { { icon = "fa-cannabis", info = "Someone is dealing Narcotics." } }, coords, "police", 3000, 11, 5)
+                { { icon = "fa-cannabis", info = "Someone is dealing Narcotics." } }, coords, Cfg.PoliceJobs, 3000, 11, 5)
         elseif Cfg.Dispatch == 'custom' then
             -- add your dispatch system here
         end

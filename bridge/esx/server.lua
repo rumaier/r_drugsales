@@ -14,21 +14,24 @@ function SvNotify(msg, type)
     end
 end
 
+function GetPlayer(source)
+    return ESX.GetPlayerFromId(source)
+end
+
 function SvAddMoney(src, amount)
-    local xPlayer = ESX.GetPlayerFromId(src)
-    if not amount then
-        print(src, " Is A Cheater")
-        return
+    local xPlayer = GetPlayer(src)
+
+    if not xPlayer or not amount then
+        print(source .. ' Is Possibly A Cheater!')
     end
-    if Cfg.Account == 'money' then
-        xPlayer.addMoney(amount)
-    else
-        xPlayer.setAccountMoney(Cfg.Account, amount)
-    end
+    if Cfg.Account == 'cash' then Cfg.Account = 'money' end
+
+    xPlayer.addAccountMoney(Cfg.Account, amount)
 end
 
 function SvRemoveItem(src, item, qty)
-    local xPlayer = ESX.GetPlayerFromId(src)
+    local xPlayer = GetPlayer(src)
+    if not xPlayer then return end
     xPlayer.removeInventoryItem(item, qty)
 end
 
@@ -36,25 +39,11 @@ function SvInvCheck(item)
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
     local item = xPlayer.getInventoryItem(item)
-    if item["stack"] then
+    if item then
         return item
     end
 end
 
-lib.callback.register('r_drugsales:getCopsOnline', function()
-    local cops = 0
-    for k, v in pairs(ESX.GetPlayers()) do
-        local xPlayer = ESX.GetPlayerFromId(v)
-        if xPlayer.job.name == 'police' then
-            cops = cops + 1
-        end
-    end
-    return cops
-end)
-
-if Cfg.Interaction == 'item' then
-    ESX.RegisterUsableItem('r_trapphone', function(source)
-        local src = source
-        TriggerClientEvent('r_drugsales:openDealerMenu', src)
-    end)
+function RegisterUsableItem(item, cb)
+    ESX.RegisterUsableItem(item, cb)
 end

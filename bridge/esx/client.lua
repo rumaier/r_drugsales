@@ -14,23 +14,22 @@ end
 
 function ClJobCheck()
     local job = ESX.GetPlayerData().job
-    return (job.name == "police")
+    for _, policeJob in ipairs(Cfg.PoliceJobs) do
+        if job.name == policeJob then
+            return true
+        end
+    end
+    return false
 end
 
-function ClInvCheck(item)
-    if not item then
-        for k, v in pairs(Cfg.Drugs) do
-            Item = ESX.SearchInventory(k)
-            if Item ~= nil then
-                GetData(Item["name"], Item["label"], Item["count"])
-                return true
-            end
-        end
-    else
-        Item = ESX.SearchInventory(item)
+function ClInvCheck()
+    for k, v in pairs(Cfg.Drugs) do
+        Item = ESX.SearchInventory(k)
         if Item ~= nil then
             GetData(Item["name"], Item["label"], Item["count"])
             return true
         end
     end
+
+    return false
 end

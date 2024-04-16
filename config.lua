@@ -29,7 +29,11 @@ Cfg = {
         }
     },
 
-    MinPolice = 0,                         -- Determines the minimum amount of police for players to sell. Set to 0 to disable.
+    MinPolice = 0, -- Determines the minimum amount of police for players to sell. Set to 0 to disable.
+    PoliceJobs = {
+        'police',
+        --      'sheriff',
+    },
     Account = 'black_money',               -- Determines the account players will be paid to upon sale.
     StreetSelling = 'pool',                -- Determines the street selling method. ('pool': grabs nearest NPC, 'spawn': spawns a ped 20 units away.)
     PoolDistance = 100,                    -- Determines the distance it will pull peds from when in StreetSelling = 'pool'. Wouldn't recommend going over 100.
