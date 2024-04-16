@@ -23,7 +23,7 @@ function SvAddMoney(src, amount)
     if Cfg.Account == 'money' then
         xPlayer.addMoney(amount)
     else
-        xPlayer.setAccountMoney(Cfg.Account, amount)
+        xPlayer.addAccountMoney(Cfg.Account, amount)
     end
 end
 
