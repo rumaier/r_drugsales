@@ -13,16 +13,31 @@ function ClNotify(msg, type)
 end
 
 function ClJobCheck()
-    local PlayerData = QBCore.Functions.GetPlayerData()
-    return (PlayerData.job.name == "police")
+    local playerData = QBCore.Functions.GetPlayerData()
+    if not playerData then return false end
+
+    for _, policeJob in ipairs(Cfg.PoliceJobs) do
+        if playerData.job.name == policeJob then
+            return true
+        end
+    end
+    return false
 end
 
 function ClInvCheck()
-    for k, v in pairs(Cfg.Drugs) do
-        Item = QBCore.Functions.HasItem(k)
-        print(json.encode(Item))
-        if Item == nil then
-            return
+    local PlayerData = QBCore.Functions.GetPlayerData()
+
+    if not PlayerData or not PlayerData.items or not next(PlayerData.items) then
+        return false
+    end
+
+    for drug, _ in pairs(Cfg.Drugs) do
+        for _, item in ipairs(PlayerData.items) do
+            if drug == item.name then
+                GetData(item.name, item.label, item.amount or item.count)
+                return true
+            end
         end
     end
+    return false
 end

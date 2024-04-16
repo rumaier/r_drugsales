@@ -14,8 +14,37 @@ function SvNotify(msg, type)
     end
 end
 
+function GetPlayer(source)
+    return QBCore.Functions.GetPlayer(source)
+end
+
 function SvAddMoney(src, amount)
-    local Player = QBCore.Functions.GetPlayer(src)
-    if not amount then print(src," Is A Cheater") return end
-    Player.Functions.AddMoney('cash', amount)
+    local player = GetPlayer(src)
+    if player or not amount then
+        print(src, " Is A Cheater")
+        return
+    end
+
+    if Cfg.Account == 'money' then Cfg.Account = 'cash' end
+
+    player.Functions.AddMoney(Cfg.Account, amount)
+end
+
+function SvRemoveItem(src, item, qty)
+    local player = GetPlayer(src)
+    if not player then return end
+    player.Functions.RemoveItem(item, qty)
+end
+
+function SvInvCheck(item)
+    local src = source
+    local player = GetPlayer(src)
+    local inventory = player.Functions.GetItemByName(item)
+    if inventory then
+        return inventory
+    end
+end
+
+function RegisterUsableItem(item, cb)
+    QBCore.Functions.CreateUseableItem(item, cb)
 end

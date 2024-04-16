@@ -15,13 +15,13 @@ shared_scripts {
 }
 
 client_scripts {
-    'client/*.lua',
     'bridge/**/client.lua',
+    'client/*.lua',
 }
 
 server_scripts {
-    'server/*.lua',
     'bridge/**/server.lua',
+    'server/*.lua',
 }
 
 dependencies {

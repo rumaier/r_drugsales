@@ -455,7 +455,7 @@ end)
 RegisterNetEvent('r_drugsales:openDealerMenu')
 AddEventHandler('r_drugsales:openDealerMenu', function()
     local cop = ClJobCheck()
-    local copcount = lib.callback.await('r_drugsales:getCopsOnline', false)
+    local copcount = lib.callback.await('r_drugsales:getCopsOnline', false) or 0
     if cop then
         ClNotify('Nice try narc!', 'error')
         return
