@@ -34,7 +34,7 @@ lib.callback.register('r_drugsales:getCopsOnline', function()
         if playerId then
             local player = GetPlayer(tonumber(playerId))
             if player then
-                local job = player.job.name
+                local job = player.job and player.job.name or player.PlayerData.job.name
                 for _, policeJob in ipairs(Cfg.PoliceJobs) do
                     if job == policeJob then
                         cops = cops + 1
