@@ -27,3 +27,5 @@ This is a script designed to be a versatile way for players in your server to se
 6. Configure your servers drugs and dispatch in config.lua
 7. Restart Server and Enjoy!
  
+## Support:
+- [Discord](https://discord.gg/8TzrRRheV5)
