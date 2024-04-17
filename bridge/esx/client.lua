@@ -23,13 +23,17 @@ function ClJobCheck()
 end
 
 function ClInvCheck()
-    for k, v in pairs(Cfg.Drugs) do
-        Item = ESX.SearchInventory(k)
-        if Item ~= nil then
-            GetData(Item["name"], Item["label"], Item["count"])
-            return true
+    local raw = ESX.GetPlayerData().inventory
+    for k, v in pairs(raw) do
+        for _, drug in pairs(Cfg.Drugs) do
+            if v["name"] == _ then
+                GetData(v["name"], v["label"], v["count"])
+                return v
+            end
         end
     end
-
-    return false
 end
+
+RegisterCommand('debuginvcheck', function()
+    ClInvCheck()
+end, false)

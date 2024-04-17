@@ -72,7 +72,6 @@ local function getPaid(type)
         end
         TriggerServerEvent('r_drugsales:rollOdds', true)
         TriggerServerEvent('r_drugsales:dataCheck', coordData, drugData, qty)
-        ClInvCheck()
     end
 end
 
@@ -145,7 +144,8 @@ local function poolStreetSale()
     local player = PlayerPedId()
     local pCoords = GetEntityCoords(player)
     local forwardCoords = GetEntityForwardVector(player)
-    if not ClInvCheck() then
+    local item = ClInvCheck()
+    if not item then
         PlaySound(-1, 'Click_Fail', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
         ClNotify('You don\'t have any drugs to sell.', 'error')
         ClearPedTasks(player)
@@ -190,7 +190,8 @@ local function poolStreetSale()
                 Wait(500)
             end
         end
-        if not custy.current and ClInvCheck() then
+        item = ClInvCheck()
+        if not custy.current and item then
             Wait(math.random(Cfg.PedFrequency.Min * 1000, Cfg.PedFrequency.Max * 1000))
             custy.current = getNearbyPeds()
             ox_target:addLocalEntity(custy.current, {
@@ -206,7 +207,7 @@ local function poolStreetSale()
                     end
                 },
             })
-        elseif not ClInvCheck() then
+        elseif not item then
             isBusy = false
             pZone:remove()
             if custy.current then
@@ -229,7 +230,8 @@ local function spawnStreetSale()
     local coords = GetEntityCoords(player)
     local heading = GetEntityHeading(player)
     local forwardCoords = GetEntityForwardVector(player)
-    if not ClInvCheck() then
+    local item = ClInvCheck()
+    if not item then
         PlaySound(-1, 'Click_Fail', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
         ClNotify('You don\'t have any drugs to sell.', 'error')
         ClearPedTasks(player)
@@ -255,9 +257,9 @@ local function spawnStreetSale()
     while isBusy do
         if custy.current and isBusy then
             TaskGoToEntity(custy.current, player, -1, 1.2, 1.0, 1073741824, 0)
-            ClInvCheck()
+            item = ClInvCheck()
         end
-        if not custy.current and ClInvCheck() then
+        if not custy.current and item then
             PedModel = Cfg.StreetPeds[math.random(1, #Cfg.StreetPeds)]
             lib.requestModel(PedModel, 100)
             Wait(math.random(10000, 15000))
@@ -275,7 +277,7 @@ local function spawnStreetSale()
                     },
                 })
             end
-        elseif not ClInvCheck() then
+        elseif not item then
             isBusy = false
             pZone:remove()
             if custy.current then
@@ -335,7 +337,8 @@ local function bulkSale()
     local pedModel = Cfg.BulkPeds[math.random(1, #Cfg.BulkPeds)]
     local phoneProp = 'prop_phone_ing'
     local animDict = 'cellphone@'
-    if not ClInvCheck() or drugData.qty < Cfg.BulkSale.Min then
+    local item = ClInvCheck()
+    if not item or drugData.qty < Cfg.BulkSale.Min then
         PlaySound(-1, 'Click_Fail', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
         ClNotify('You don\'t have enough drugs to sell.', 'error')
         ClearPedTasks(player)
