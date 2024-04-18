@@ -16,7 +16,7 @@ This is a script designed to be a versatile way for players in your server to se
 
 ## Dependencies:
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
-- [es_extended](https://github.com/esx-framework) or ~~[qb-core](https://github.com/qbcore-framework)~~ _QBCORE SOON_
+- [es_extended](https://github.com/esx-framework) or [qb-core](https://github.com/qbcore-framework)
 
 ## Installation
 1. Download the script files
