@@ -2,7 +2,6 @@ local drugData = {}
 local custy = {}
 local inZone = false
 local isBusy = false
-local ox_target = exports.ox_target
 
 local function setRoute(x, y, z)
     if x == nil then
@@ -85,7 +84,7 @@ local function getRejected()
     RemovePedElegantly(custy.current)
     SetModelAsNoLongerNeeded(bagModel)
     SetModelAsNoLongerNeeded(cashModel)
-    ox_target:removeLocalEntity(custy.current)
+    RemoveLocalEntity(custy.current)
     custy.last = custy.current
     custy.current = nil
 end
@@ -134,7 +133,7 @@ local function streetSell()
     RemovePedElegantly(custy.current)
     SetModelAsNoLongerNeeded(bagModel)
     SetModelAsNoLongerNeeded(cashModel)
-    ox_target:removeLocalEntity(custy.current)
+    -- RemoveLocalEntity(custy.current)
     custy.last = custy.current
     custy.current = nil
 end
@@ -160,7 +159,7 @@ local function poolStreetSale()
             pZone:remove()
             if custy.current then
                 RemovePedElegantly(custy.current)
-                ox_target:removeLocalEntity(custy.current)
+                RemoveLocalEntity(custy.current)
             end
             custy.current = nil
             ClNotify('Selling cancelled.', 'error')
@@ -194,12 +193,14 @@ local function poolStreetSale()
         if not custy.current and item then
             Wait(math.random(Cfg.PedFrequency.Min * 1000, Cfg.PedFrequency.Max * 1000))
             custy.current = getNearbyPeds()
-            ox_target:addLocalEntity(custy.current, {
+            AddLocalEntity(custy.current, {
                 {
                     label = 'Sell ' .. drugData.label .. '',
                     name = 'streetsale',
                     icon = 'fas fa-cannabis',
-                    distance = 1.5,
+                    canInteract = function()
+                        return custy.current
+                    end,
                     onSelect = function()
                         TaskTurnPedToFaceEntity(player, custy.current, 500)
                         Wait(500)
@@ -212,7 +213,7 @@ local function poolStreetSale()
             pZone:remove()
             if custy.current then
                 RemovePedElegantly(custy.current)
-                ox_target:removeLocalEntity(custy.current)
+                RemoveLocalEntity(custy.current)
             end
             custy.current = nil
             SetModelAsNoLongerNeeded(PedModel)
@@ -246,7 +247,7 @@ local function spawnStreetSale()
             pZone:remove()
             if custy.current then
                 RemovePedElegantly(custy.current)
-                ox_target:removeLocalEntity(custy.current)
+                RemoveLocalEntity(custy.current)
             end
             custy.current = nil
             ClNotify('Selling cancelled.', 'error')
@@ -265,12 +266,14 @@ local function spawnStreetSale()
             Wait(math.random(10000, 15000))
             if isBusy then
                 custy.current = CreatePed(0, PedModel, coords.x + (forwardCoords.x * 20), coords.y + (forwardCoords.y * 20), coords.z, heading - 180.0, true, true)
-                ox_target:addLocalEntity(custy.current, {
+                AddLocalEntity(custy.current, {
                     {
                         label = 'Sell ' .. drugData.label .. '',
                         name = 'streetsale',
                         icon = 'fas fa-cannabis',
-                        distance = 1.0,
+                        canInteract = function()
+                            return custy.current
+                        end,
                         onSelect = function()
                             streetSell()
                         end
@@ -282,7 +285,7 @@ local function spawnStreetSale()
             pZone:remove()
             if custy.current then
                 RemovePedElegantly(custy.current)
-                ox_target:removeLocalEntity(custy.current)
+                RemoveLocalEntity(custy.current)
             end
             custy.current = nil
             SetModelAsNoLongerNeeded(PedModel)
@@ -360,12 +363,14 @@ local function bulkSale()
     SetEntityInvincible(custy.current, true)
     FreezeEntityPosition(custy.current, true)
     SetBlockingOfNonTemporaryEvents(custy.current, true)
-    ox_target:addLocalEntity(custy.current, {
+    AddLocalEntity(custy.current, {
         {
             label = 'Sell ' .. drugData.label .. '',
             name = 'bulksale',
             icon = 'fas fa-cannabis',
-            distance = 1.0,
+            canInteract = function()
+                return custy.current
+            end,
             onSelect = function()
                 bulkSell()
             end

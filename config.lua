@@ -8,6 +8,7 @@ Cfg = {
     -- Server options
     Notification = 'default', -- Determines the notification system. ('default', 'ox', 'custom': can be customized in bridge/"FRAMEWORK")
     Interaction = 'item',     -- Determines how players will open the Dealer Menu. ('item' or 'command') MUST HAVE ITEM INSTALLED FOR 'item'!!
+    Target = 'ox_target',     -- Determines which targeting system to utilize. ('ox_target' and 'qb-target')
 
     -- Dispatch Options
     Dispatch = 'linden_outlawalert', -- Determines the dispatch system. ('linden_outlawalert', 'cd_dispatch', 'rcore_dispatch', 'core_dispatch', 'custom': can be customized in bridge/dispatch. false to disable. )
