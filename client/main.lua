@@ -190,7 +190,7 @@ local function poolStreetSale()
         if not custy.current and item then
             Wait(math.random(Cfg.PedFrequency.Min * 1000, Cfg.PedFrequency.Max * 1000))
             custy.current = getNearbyPeds()
-            AddLocalEntity(custy.current, {
+            Target.AddLocalEntity(custy.current, {
                 {
                     label = 'Sell ' .. drugData.label .. '',
                     name = 'streetsale',
@@ -261,7 +261,7 @@ local function spawnStreetSale()
             Wait(math.random(10000, 15000))
             if isBusy then
                 custy.current = CreatePed(0, PedModel, coords.x + (forwardCoords.x * 20), coords.y + (forwardCoords.y * 20), coords.z, heading - 180.0, true, true)
-                AddLocalEntity(custy.current, {
+                Target.AddLocalEntity(custy.current, {
                     {
                         label = 'Sell ' .. drugData.label .. '',
                         name = 'streetsale',
@@ -357,7 +357,7 @@ local function bulkSale()
     SetEntityInvincible(custy.current, true)
     FreezeEntityPosition(custy.current, true)
     SetBlockingOfNonTemporaryEvents(custy.current, true)
-    AddLocalEntity(custy.current, {
+    Target.AddLocalEntity(custy.current, {
         {
             label = 'Sell ' .. drugData.label .. '',
             name = 'bulksale',
