@@ -453,7 +453,7 @@ CreateThread(function()
             end,
             debug = Cfg.SellZone.Debug
         })
-    end
+    else return end
 end)
 
 RegisterNetEvent('r_drugsales:openDealerMenu')
