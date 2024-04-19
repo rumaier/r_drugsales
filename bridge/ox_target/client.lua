@@ -1,4 +1,5 @@
 if GetResourceState('ox_target') ~= 'started' then return end
+local ox_target = exports.ox_target
 
 Target = {
     AddLocalEntity = function(entities, options)
