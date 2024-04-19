@@ -84,7 +84,6 @@ local function getRejected()
     RemovePedElegantly(custy.current)
     SetModelAsNoLongerNeeded(bagModel)
     SetModelAsNoLongerNeeded(cashModel)
-    RemoveLocalEntity(custy.current)
     custy.last = custy.current
     custy.current = nil
 end
@@ -133,7 +132,6 @@ local function streetSell()
     RemovePedElegantly(custy.current)
     SetModelAsNoLongerNeeded(bagModel)
     SetModelAsNoLongerNeeded(cashModel)
-    -- RemoveLocalEntity(custy.current)
     custy.last = custy.current
     custy.current = nil
 end
@@ -159,7 +157,6 @@ local function poolStreetSale()
             pZone:remove()
             if custy.current then
                 RemovePedElegantly(custy.current)
-                RemoveLocalEntity(custy.current)
             end
             custy.current = nil
             ClNotify('Selling cancelled.', 'error')
@@ -213,7 +210,6 @@ local function poolStreetSale()
             pZone:remove()
             if custy.current then
                 RemovePedElegantly(custy.current)
-                RemoveLocalEntity(custy.current)
             end
             custy.current = nil
             SetModelAsNoLongerNeeded(PedModel)
@@ -247,7 +243,6 @@ local function spawnStreetSale()
             pZone:remove()
             if custy.current then
                 RemovePedElegantly(custy.current)
-                RemoveLocalEntity(custy.current)
             end
             custy.current = nil
             ClNotify('Selling cancelled.', 'error')
@@ -285,7 +280,6 @@ local function spawnStreetSale()
             pZone:remove()
             if custy.current then
                 RemovePedElegantly(custy.current)
-                RemoveLocalEntity(custy.current)
             end
             custy.current = nil
             SetModelAsNoLongerNeeded(PedModel)
@@ -402,18 +396,20 @@ function OpenDealerMenu()
                 description = 'Sell to clients on the streets.',
                 icon = 'joint',
                 onSelect = function()
-                    if not inZone then
-                        PlaySound(-1, 'Click_Fail', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
-                        ClNotify('You can only sell in the hood.', 'error')
-                        ClearPedTasks(player)
-                    else
-                        PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)
-                        ClearPedTasks(player)
-                        if Cfg.StreetSelling == 'spawn' then
-                            spawnStreetSale()
-                        elseif Cfg.StreetSelling == 'pool' then
-                            poolStreetSale()
+                    if Cfg.SellZone.Enabled then
+                        if not inZone then
+                            PlaySound(-1, 'Click_Fail', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
+                            ClNotify('You can only sell in the hood.', 'error')
+                            ClearPedTasks(player)
+                            return
                         end
+                    end
+                    PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)
+                    ClearPedTasks(player)
+                    if Cfg.StreetSelling == 'spawn' then
+                        spawnStreetSale()
+                    elseif Cfg.StreetSelling == 'pool' then
+                        poolStreetSale()
                     end
                 end,
                 metadata = {
