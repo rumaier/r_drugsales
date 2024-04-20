@@ -63,7 +63,7 @@ Cfg = {
 
     -- Sell Zone Options
     SellZone = {
-        Enabled = false,                    -- Toggles the sellzone players can sell in.
+        Enabled = true,                    -- Toggles the sellzone players can sell in.
         ZoneCoords = {                     -- Polyzone coords for zone. MAKE ALL Z VALUES MATCH!
             vec3(123.16, -1937.44, 20.72), -- Default zone covers Grove St. (https://overextended.dev/ox_lib/Modules/Zones/Shared#zone-creation-script)
             vec3(122.71, -1945.11, 20.72),

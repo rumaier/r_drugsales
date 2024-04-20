@@ -16,6 +16,7 @@ This is a script designed to be a versatile way for players in your server to se
 
 ## Dependencies:
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
+- [ox_target](https://github.com/overextended/ox_target/releases) or [qb-target](https://github.com/qbcore-framework/qb-target)
 - [es_extended](https://github.com/esx-framework) or [qb-core](https://github.com/qbcore-framework)
 
 ## Installation
@@ -26,6 +27,9 @@ This is a script designed to be a versatile way for players in your server to se
 5. Add `ensure r_drugsales` to your server.cfg
 6. Configure your servers drugs and dispatch in config.lua
 7. Restart Server and Enjoy!
+
+## Documentation:
+- [Gitbook](https://r-scripts-1.gitbook.io/r_scripts-docs./r_drugsales)
  
 ## Support:
 - [Discord](https://discord.gg/8TzrRRheV5)
