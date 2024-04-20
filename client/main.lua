@@ -107,10 +107,10 @@ local function streetSell()
     local animDict2 = 'weapons@holster_fat_2h'
     local bagModel = joaat('prop_meth_bag_01')
     local cashModel = joaat('prop_anim_cash_note')
-    lib.requestModel(bagModel, 100)
-    lib.requestModel(cashModel, 100)
-    lib.requestAnimDict(animDict1, 100)
-    lib.requestAnimDict(animDict2, 100)
+    lib.requestModel(bagModel)
+    lib.requestModel(cashModel)
+    lib.requestAnimDict(animDict1)
+    lib.requestAnimDict(animDict2)
     local bag = CreateObject(bagModel, 0, 0, 0, true, false, false)
     local cash = CreateObject(cashModel, 0, 0, 0, true, false, false)
     AttachEntityToEntity(bag, player, 90, 0.07, 0.01, -0.01, 136.33, 50.23, -50.26, true, true, false, true, 1, true)
@@ -141,7 +141,7 @@ local function poolStreetSale()
     local player = PlayerPedId()
     local pCoords = GetEntityCoords(player)
     local forwardCoords = GetEntityForwardVector(player)
-    local item = ClInvCheck()
+    local item = ClInvCheck('street')
     if not item then
         PlaySound(-1, 'Click_Fail', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
         ClNotify('You don\'t have any drugs to sell.', 'error')
@@ -186,7 +186,7 @@ local function poolStreetSale()
                 Wait(500)
             end
         end
-        item = ClInvCheck()
+        item = ClInvCheck('street')
         if not custy.current and item then
             Wait(math.random(Cfg.PedFrequency.Min * 1000, Cfg.PedFrequency.Max * 1000))
             custy.current = getNearbyPeds()
@@ -227,7 +227,7 @@ local function spawnStreetSale()
     local coords = GetEntityCoords(player)
     local heading = GetEntityHeading(player)
     local forwardCoords = GetEntityForwardVector(player)
-    local item = ClInvCheck()
+    local item = ClInvCheck('street')
     if not item then
         PlaySound(-1, 'Click_Fail', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
         ClNotify('You don\'t have any drugs to sell.', 'error')
@@ -253,11 +253,11 @@ local function spawnStreetSale()
     while isBusy do
         if custy.current and isBusy then
             TaskGoToEntity(custy.current, player, -1, 1.2, 1.0, 1073741824, 0)
-            item = ClInvCheck()
+            item = ClInvCheck('street')
         end
         if not custy.current and item then
             PedModel = Cfg.StreetPeds[math.random(1, #Cfg.StreetPeds)]
-            lib.requestModel(PedModel, 100)
+            lib.requestModel(PedModel)
             Wait(math.random(10000, 15000))
             if isBusy then
                 custy.current = CreatePed(0, PedModel, coords.x + (forwardCoords.x * 20), coords.y + (forwardCoords.y * 20), coords.z, heading - 180.0, true, true)
@@ -296,10 +296,10 @@ local function bulkSell()
     local animDict2 = 'weapons@holster_fat_2h'
     local bagModel = joaat('xm_prop_x17_bag_01d')
     local cashModel = joaat('prop_anim_cash_pile_01')
-    lib.requestModel(bagModel, 100)
-    lib.requestModel(cashModel, 100)
-    lib.requestAnimDict(animDict1, 100)
-    lib.requestAnimDict(animDict2, 100)
+    lib.requestModel(bagModel)
+    lib.requestModel(cashModel)
+    lib.requestAnimDict(animDict1)
+    lib.requestAnimDict(animDict2)
     local bag = CreateObject(bagModel, 0, 0, 0, true, false, false)
     local cash = CreateObject(cashModel, 0, 0, 0, true, false, false)
     AttachEntityToEntity(bag, player, GetPedBoneIndex(player, 28422), 0.39, -0.06, -0.06, -100.00, -180.00, -78.00, true, true, false, true, 1, true)
@@ -334,7 +334,7 @@ local function bulkSale()
     local pedModel = Cfg.BulkPeds[math.random(1, #Cfg.BulkPeds)]
     local phoneProp = 'prop_phone_ing'
     local animDict = 'cellphone@'
-    local item = ClInvCheck()
+    local item = ClInvCheck('bulk')
     if not item or drugData.qty < Cfg.BulkSale.Min then
         PlaySound(-1, 'Click_Fail', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
         ClNotify('You don\'t have enough drugs to sell.', 'error')
@@ -343,9 +343,9 @@ local function bulkSale()
     end
     isBusy = true
     local meetup = Cfg.MeetupCoords[math.random(1, #Cfg.MeetupCoords)]
-    lib.requestAnimDict(animDict, 100)
-    lib.requestModel(pedModel, 100)
-    lib.requestModel(phoneProp, 100)
+    lib.requestAnimDict(animDict)
+    lib.requestModel(pedModel)
+    lib.requestModel(phoneProp)
     ClearPedTasksImmediately(player)
     local phone = CreateObject(phoneProp, 0, 0, 0, true, false, false)
     PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)

@@ -8,7 +8,6 @@ Cfg = {
     -- Server options
     Notification = 'default', -- Determines the notification system. ('default', 'ox', 'custom': can be customized in bridge/"FRAMEWORK")
     Interaction = 'item',     -- Determines how players will open the Dealer Menu. ('item' or 'command') MUST HAVE ITEM INSTALLED FOR 'item'!!
-    Target = 'ox_target',     -- Determines which targeting system to utilize. ('ox_target' and 'qb-target')
 
     -- Dispatch Options
     Dispatch = 'linden_outlawalert', -- Determines the dispatch system. ('linden_outlawalert', 'cd_dispatch', 'rcore_dispatch', 'core_dispatch', 'custom': can be customized in bridge/dispatch. false to disable. )
@@ -64,7 +63,7 @@ Cfg = {
 
     -- Sell Zone Options
     SellZone = {
-        Enabled = true,                    -- Toggles the sellzone players can sell in.
+        Enabled = false,                    -- Toggles the sellzone players can sell in.
         ZoneCoords = {                     -- Polyzone coords for zone. MAKE ALL Z VALUES MATCH!
             vec3(123.16, -1937.44, 20.72), -- Default zone covers Grove St. (https://overextended.dev/ox_lib/Modules/Zones/Shared#zone-creation-script)
             vec3(122.71, -1945.11, 20.72),
