@@ -396,7 +396,7 @@ function OpenDealerMenu()
                 description = 'Sell to clients on the streets.',
                 icon = 'joint',
                 onSelect = function()
-                    if Cfg.SellZone.Enabled then
+                    if Cfg.SellZones.Enabled then
                         if not inZone then
                             PlaySound(-1, 'Click_Fail', 'WEB_NAVIGATION_SOUNDS_PHONE', false, 0, true)
                             ClNotify('You can only sell in the hood.', 'error')
@@ -441,18 +441,20 @@ function GetData(drug, label, qty)
 end
 
 CreateThread(function()
-    if Cfg.SellZone.Enabled then
-        lib.zones.poly({
-            points = Cfg.SellZone.ZoneCoords,
-            thickness = 30,
-            onEnter = function()
-                inZone = true
-            end,
-            onExit = function()
-                inZone = false
-            end,
-            debug = Cfg.SellZone.Debug
-        })
+    if Cfg.SellZones.Enabled then
+        for k, v in ipairs(Cfg.SellZones.Zones) do
+            lib.zones.poly({
+                points = Cfg.SellZones.Zones[k],
+                thickness = 30,
+                onEnter = function()
+                    inZone = true
+                end,
+                onExit = function()
+                    inZone = false
+                end,
+                debug = Cfg.SellZones.Debug
+            })
+        end
     else return end
 end)
 

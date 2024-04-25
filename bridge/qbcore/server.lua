@@ -20,15 +20,28 @@ end
 
 function SvAddMoney(src, amount)
     local player = GetPlayer(src)
-    if player or not amount then
+    print('player:', player)
+    print('amount:', amount)
+    if not player or not amount then
         print(src, " Is A Cheater")
         return
     end
 
-    if Cfg.Account == 'money' then Cfg.Account = 'cash' end
+    if Cfg.Account == 'black_money' or Cfg.Account == 'markedbills' then
+        player.Functions.AddItem(Cfg.Account, amount)
+        TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[Cfg.Account], 'add')
+        return
+    end
 
-    player.Functions.AddMoney(Cfg.Account, amount)
+    if Cfg.Account == 'money' or Cfg.Account == 'cash' then
+        Cfg.Account = 'cash'
+        player.Functions.AddMoney(Cfg.Account, amount)    
+    end
 end
+
+RegisterCommand('debugQBshit', function()
+    SvAddMoney(2, 100)
+end, false)
 
 function SvRemoveItem(src, item, qty)
     local player = GetPlayer(src)
