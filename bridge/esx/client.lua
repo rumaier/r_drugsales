@@ -45,7 +45,3 @@ function ClInvCheck(type)
         end
     end
 end
-
-RegisterCommand('debuginvcheck', function()
-    ClInvCheck()
-end, false)
