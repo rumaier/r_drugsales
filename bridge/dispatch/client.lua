@@ -1,12 +1,12 @@
 if not Cfg.Dispatch then return end
 
 RegisterNetEvent('r_drugsales:notifyPolice')
-AddEventHandler('r_drugsales:notifyPolice', function()
+AddEventHandler('r_drugsales:notifyPolice', function(coords)
     local cop = ClJobCheck()
     if cop then
         if Cfg.Dispatch == 'linden_outlawalert' then
             local player = PlayerPedId()
-            local coords = GetEntityCoords(player)
+            local coords = coords
             local data = {
                 displayCode = '10-17',
                 description = 'Suspicious Person',

@@ -59,7 +59,7 @@ local function getPaid(type)
         else
             qty = math.random(Cfg.BulkSale.Min, Cfg.BulkSale.Max)
         end
-        TriggerServerEvent('r_drugsales:rollOdds', true)
+        TriggerServerEvent('r_drugsales:rollOdds', true, pCoords)
         TriggerServerEvent('r_drugsales:dataCheck', coordData, drugData, qty)
     elseif type == 'street' then
         local qty = nil
@@ -69,15 +69,17 @@ local function getPaid(type)
         else
             qty = math.random(Cfg.StreetSale.Min, Cfg.StreetSale.Max)
         end
-        TriggerServerEvent('r_drugsales:rollOdds', true)
+        TriggerServerEvent('r_drugsales:rollOdds', true, pCoords)
         TriggerServerEvent('r_drugsales:dataCheck', coordData, drugData, qty)
     end
 end
 
 local function getRejected()
+    local player = PlayerPedId()
+    local pCoords = GetEntityCoords(player)
     PlayPedAmbientSpeechNative(custy.current, 'GENERIC_INSULT_HIGH', 'SPEECH_PARAMS_FORCE')
     if Cfg.NotifyPoliceOnReject then
-        TriggerServerEvent('r_drugsales:rollOdds', false)
+        TriggerServerEvent('r_drugsales:rollOdds', false, pCoords)
     end
     ClNotify('I don\'t want this bulls***!', 'error')
     TaskWanderStandard(custy.current, 10.0, 10)
