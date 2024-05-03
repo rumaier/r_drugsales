@@ -6,7 +6,7 @@ AddEventHandler('r_drugsales:notifyPolice', function()
     if cop then
         if Cfg.Dispatch == 'linden_outlawalert' then
             local player = PlayerPedId()
-            local coords = vec3(74.6433, -1902.6025, 21.5645)
+            local coords = GetEntityCoords(player)
             local data = {
                 displayCode = '10-17',
                 description = 'Suspicious Person',
