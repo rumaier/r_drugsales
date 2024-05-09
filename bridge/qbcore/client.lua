@@ -32,7 +32,7 @@ function ClInvCheck()
     end
 
     for drug, _ in pairs(Cfg.Drugs) do
-        for _, item in ipairs(PlayerData.items) do
+        for _, item in pairs(PlayerData.items) do
             if drug == item.name then
                 GetData(item.name, item.label, item.amount or item.count)
                 return true
