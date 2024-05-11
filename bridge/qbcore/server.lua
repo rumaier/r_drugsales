@@ -39,10 +39,6 @@ function SvAddMoney(src, amount)
     end
 end
 
-RegisterCommand('debugQBshit', function()
-    SvAddMoney(2, 100)
-end, false)
-
 function SvRemoveItem(src, item, qty)
     local player = GetPlayer(src)
     if not player then return end
