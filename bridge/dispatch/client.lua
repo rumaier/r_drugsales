@@ -5,7 +5,6 @@ AddEventHandler('r_drugsales:notifyPolice', function(coords)
     local cop = ClJobCheck()
     if cop then
         if Cfg.Dispatch == 'linden_outlawalert' then
-            local player = PlayerPedId()
             local coords = coords
             local data = {
                 displayCode = '10-17',
@@ -22,7 +21,7 @@ AddEventHandler('r_drugsales:notifyPolice', function(coords)
             local data = exports['cd_dispatch']:GetPlayerInfo()
             TriggerServerEvent('cd_dispatch:AddNotification', {
                 job_table = Cfg.PoliceJobs,
-                coords = data.coords,
+                coords = coords,
                 title = '10-17 - Suspicious Person',
                 message = 'A ' .. data.sex .. ' is dealing narcotics at ' .. data.street,
                 flash = 0,
@@ -46,7 +45,7 @@ AddEventHandler('r_drugsales:notifyPolice', function(coords)
             local data = {
                 code = '10-17 - Suspicious Person',
                 default_priority = 'low',
-                coords = player_data.coords,
+                coords = coords,
                 job = Cfg.PoliceJobs,
                 text = text,
                 type = 'alerts',
@@ -61,8 +60,7 @@ AddEventHandler('r_drugsales:notifyPolice', function(coords)
             }
             TriggerServerEvent('rcore_dispatch:server:sendAlert', data)
         elseif Cfg.Dispatch == 'core_dispatch' then
-            local player = PlayerPedId()
-            local coords = GetEntityCoords(player)
+            local coords = coords
             exports['core_dispatch']:addCall("10-17", "Suspicious Person",
                 { { icon = "fa-cannabis", info = "Someone is dealing Narcotics." } }, coords, Cfg.PoliceJobs, 3000, 11, 5)
         elseif Cfg.Dispatch == 'custom' then
