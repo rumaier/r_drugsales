@@ -2,6 +2,8 @@ local drugData = {}
 local custy = {}
 local inZone = false
 local isBusy = false
+local streetSelling = false
+local bulkSelling = false
 
 local function setRoute(x, y, z)
     if x == nil then
@@ -150,25 +152,26 @@ local function poolStreetSale()
         ClearPedTasks(player)
         return
     end
-    isBusy = true
+    streetSelling = true
     pZone = lib.zones.sphere({
         coords = pCoords,
         radius = 5,
         onExit = function()
-            isBusy = false
+            streetSelling = false
             pZone:remove()
             if custy.current then
+                custy.current = nil
                 RemovePedElegantly(custy.current)
             end
-            custy.current = nil
+            drugData = {}
             ClNotify('Selling cancelled.', 'error')
             return
         end,
         debug = false
     })
     ClNotify('Stay here and wait for customers.', 'info')
-    while isBusy do
-        if custy.current and isBusy then
+    while streetSelling do
+        if streetSelling and custy.current then
             pCoords = GetEntityCoords(player)
             local cCoords = GetEntityCoords(custy.current)
             local distance = #(pCoords - cCoords)
@@ -189,26 +192,28 @@ local function poolStreetSale()
             end
         end
         item = ClInvCheck('street')
-        if not custy.current and item then
+        if streetSelling and not custy.current and item then
             Wait(math.random(Cfg.PedFrequency.Min * 1000, Cfg.PedFrequency.Max * 1000))
-            custy.current = getNearbyPeds()
-            Target.AddLocalEntity(custy.current, {
-                {
-                    label = 'Sell ' .. drugData.label .. '',
-                    name = 'streetsale',
-                    icon = 'fas fa-cannabis',
-                    canInteract = function()
-                        return custy.current
-                    end,
-                    onSelect = function()
-                        TaskTurnPedToFaceEntity(player, custy.current, 500)
-                        Wait(500)
-                        streetSell()
-                    end
-                },
-            })
-        elseif not item then
-            isBusy = false
+            if streetSelling then
+                custy.current = getNearbyPeds()
+                Target.addLocalEntity(custy.current, {
+                    {
+                        label = 'Sell ' .. drugData.label .. '',
+                        name = 'streetsale',
+                        icon = 'fas fa-cannabis',
+                        canInteract = function()
+                            return custy.current
+                        end,
+                        onSelect = function()
+                            TaskTurnPedToFaceEntity(player, custy.current, 500)
+                            Wait(500)
+                            streetSell()
+                        end
+                    },
+                })
+            end
+        elseif not streetSelling or not item then
+            streetSelling = false
             pZone:remove()
             if custy.current then
                 RemovePedElegantly(custy.current)
@@ -221,7 +226,6 @@ local function poolStreetSale()
         Wait(1000)
     end
 end
-
 
 local function spawnStreetSale()
     local pZone = nil
@@ -236,24 +240,26 @@ local function spawnStreetSale()
         ClearPedTasks(player)
         return
     end
-    isBusy = true
+    streetSelling = true
     pZone = lib.zones.sphere({
         coords = coords,
         radius = 5,
         onExit = function()
-            isBusy = false
+            streetSelling = false
             pZone:remove()
             if custy.current then
+                custy.current = nil
                 RemovePedElegantly(custy.current)
             end
-            custy.current = nil
+            drugData = {}
             ClNotify('Selling cancelled.', 'error')
+            return
         end,
         debug = false
     })
     ClNotify('Stay here and wait for customers.', 'info')
-    while isBusy do
-        if custy.current and isBusy then
+    while streetSelling do
+        if custy.current and streetSelling then
             TaskGoToEntity(custy.current, player, -1, 1.2, 1.0, 1073741824, 0)
             item = ClInvCheck('street')
         end
@@ -261,9 +267,9 @@ local function spawnStreetSale()
             PedModel = Cfg.StreetPeds[math.random(1, #Cfg.StreetPeds)]
             lib.requestModel(PedModel)
             Wait(math.random(10000, 15000))
-            if isBusy then
+            if streetSelling then
                 custy.current = CreatePed(0, PedModel, coords.x + (forwardCoords.x * 20), coords.y + (forwardCoords.y * 20), coords.z, heading - 180.0, true, true)
-                Target.AddLocalEntity(custy.current, {
+                Target.addLocalEntity(custy.current, {
                     {
                         label = 'Sell ' .. drugData.label .. '',
                         name = 'streetsale',
@@ -278,7 +284,7 @@ local function spawnStreetSale()
                 })
             end
         elseif not item then
-            isBusy = false
+            streetSelling = false
             pZone:remove()
             if custy.current then
                 RemovePedElegantly(custy.current)
@@ -324,7 +330,7 @@ local function bulkSell()
     ClearGpsMultiRoute()
     RemoveBlip(MeetBlip)
     custy.current = nil
-    isBusy = false
+    bulkSelling = false
     SetModelAsNoLongerNeeded(bagModel)
     SetModelAsNoLongerNeeded(cashModel)
     RemoveAnimDict(animDict1)
@@ -343,7 +349,7 @@ local function bulkSale()
         ClearPedTasks(player)
         return
     end
-    isBusy = true
+    bulkSelling = true
     local meetup = Cfg.MeetupCoords[math.random(1, #Cfg.MeetupCoords)]
     lib.requestAnimDict(animDict)
     lib.requestModel(pedModel)
@@ -359,7 +365,7 @@ local function bulkSale()
     SetEntityInvincible(custy.current, true)
     FreezeEntityPosition(custy.current, true)
     SetBlockingOfNonTemporaryEvents(custy.current, true)
-    Target.AddLocalEntity(custy.current, {
+    Target.addLocalEntity(custy.current, {
         {
             label = 'Sell ' .. drugData.label .. '',
             name = 'bulksale',
@@ -468,7 +474,7 @@ AddEventHandler('r_drugsales:openDealerMenu', function()
         ClNotify('Nice try narc!', 'error')
         return
     end
-    if isBusy then
+    if streetSelling or bulkSelling then
         ClNotify('You are already selling!', 'error')
         return
     end

@@ -1,7 +1,7 @@
 if GetResourceState('qb-target') ~= 'started' then return end
 
 Target = {
-    AddLocalEntity = function(entities, options)
+    addLocalEntity = function(entities, options)
         for k, v in pairs(options) do
             options[k].action = v.onSelect
         end
@@ -11,7 +11,7 @@ Target = {
         })
     end,
 
-    AddBoxZone = function(name, coords, size, heading, options)
+    addBoxZone = function(name, coords, size, heading, options)
         for k, v in pairs(options) do
             options[k].action = v.onSelect
         end
