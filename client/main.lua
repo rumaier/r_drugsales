@@ -266,22 +266,25 @@ local function spawnStreetSale()
         if not custy.current and item then
             PedModel = Cfg.StreetPeds[math.random(1, #Cfg.StreetPeds)]
             lib.requestModel(PedModel)
-            Wait(math.random(10000, 15000))
+            Wait(math.random(Cfg.PedFrequency.Min * 1000, Cfg.PedFrequency.Max * 1000))
             if streetSelling then
                 custy.current = CreatePed(0, PedModel, coords.x + (forwardCoords.x * 20), coords.y + (forwardCoords.y * 20), coords.z, heading - 180.0, true, true)
-                Target.addLocalEntity(custy.current, {
-                    {
-                        label = 'Sell ' .. drugData.label .. '',
-                        name = 'streetsale',
-                        icon = 'fas fa-cannabis',
-                        canInteract = function()
-                            return custy.current
-                        end,
-                        onSelect = function()
-                            streetSell()
-                        end
-                    },
-                })
+                SetTimeout(500, function()
+                    Target.addLocalEntity(custy.current, {
+                        {
+                            label = 'Sell ' .. drugData.label .. '',
+                            name = 'streetsale',
+                            icon = 'fas fa-cannabis',
+                            canInteract = function()
+                                return custy.current
+                            end,
+                            onSelect = function()
+                                streetSell()
+                                Target.removeLocalEntity(custy.current)
+                            end
+                        },
+                    })
+                end)
             end
         elseif not item then
             streetSelling = false

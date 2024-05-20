@@ -11,6 +11,10 @@ Target = {
         })
     end,
 
+    removeLocalEntity = function(entities)
+        exports['qb-target']:RemoveTargetEntity(entities)
+    end,
+
     addBoxZone = function(name, coords, size, heading, options)
         for k, v in pairs(options) do
             options[k].action = v.onSelect

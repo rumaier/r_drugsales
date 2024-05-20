@@ -6,6 +6,10 @@ Target = {
         ox_target:addLocalEntity(entities, options)
     end,
 
+    removeLocalEntity = function(entities)
+        ox_target:removeLocalEntity(entities)
+    end,
+
     addBoxZone = function(name, coords, size, heading, options)
         ox_target:addBoxZone({
             coords = coords,
