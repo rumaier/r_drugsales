@@ -55,5 +55,3 @@ if Cfg.Interaction == 'item' then
 end
 
 print('ServerSide Is Loaded [r_drugsales, Disco shit... Pure as the driven snow.]')
-print('Why did the duck go to the drug dealer?')
-print('Quack.')
