@@ -8,11 +8,11 @@ lib.callback.register('r_drugsales:checkIfPolice', function(src)
     return false
 end)
 
-lib.callback.register('r_drugsales:getPoliceOnline', function()
+lib.callback.register('r_drugsales:getPoliceOnline', function(src)
     local count = 0
     local players = GetPlayers()
-    for _, src in pairs(players) do
-        local job = Framework.getPlayerJob(src)
+    for _, playerId in pairs(players) do
+        local job = Framework.getPlayerJob(tonumber(playerId))
         for _, police in pairs(Cfg.Dispatch.policeJobs) do
             if job == police then
                 count = count + 1

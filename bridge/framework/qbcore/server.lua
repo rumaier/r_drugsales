@@ -23,18 +23,21 @@ Framework = {
     getPlayerName = function(src)
         local src = src or source
         local Player = QBCore.Functions.GetPlayer(src)
+        if not Player then return false end
         return Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname
     end,
 
     getPlayerJob = function(src)
         local src = src or source
         local Player = QBCore.Functions.GetPlayer(src)
+        if not Player then return false end
         return Player.PlayerData.job.name
     end,
 
     getPlayerJobGrade = function(src)
         local src = src or source
         local Player = QBCore.Functions.GetPlayer(src)
+        if not Player then return false end
         return Player.PlayerData.job.grade.level
     end,
 
@@ -44,6 +47,7 @@ Framework = {
         end
         local src = src or source
         local Player = QBCore.Functions.GetPlayer(src)
+        if not Player then return false end
         Player.Functions.AddMoney(acct, amt, 'idk')
     end,
 
@@ -53,12 +57,14 @@ Framework = {
         end
         local src = src or source
         local Player = QBCore.Functions.GetPlayer(src)
+        if not Player then return false end
         Player.Functions.RemoveMoney(acct, amt, 'idk')
     end,
 
     getAccountBalance = function(src, acct)
         local src = src or source
         local Player = QBCore.Functions.GetPlayer(src)
+        if not Player then return false end
         if acct == 'money' then
             acct = 'cash'
         end

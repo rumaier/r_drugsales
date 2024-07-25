@@ -18,42 +18,49 @@ Framework = {
     getPlayerIdentifier = function(src)
         local src = src or source
         local xPlayer = ESX.GetPlayerFromId(src)
+        if not xPlayer then return false end
         return xPlayer.getIdentifier()
     end,
 
     getPlayerName = function(src)
         local src = src or source
         local xPlayer = ESX.GetPlayerFromId(src)
+        if not xPlayer then return false end
         return xPlayer.getName()
     end,
 
     getPlayerJob = function(src)
         local src = src or source
         local xPlayer = ESX.GetPlayerFromId(src)
+        if not xPlayer then return false end
         return xPlayer.getJob().name
     end,
 
     getPlayerJobGrade = function(src)
         local src = src or source
         local xPlayer = ESX.GetPlayerFromId(src)
+        if not xPlayer then return false end
         return xPlayer.getJob().grade
     end,
 
     addAccountMoney = function(src, acct, amt)
         local src = src or source
         local xPlayer = ESX.GetPlayerFromId(src)
+        if not xPlayer then return false end
         xPlayer.addAccountMoney(acct, amt)
     end,
 
     removeAccountMoney = function(src, acct, amt)
         local src = src or source
         local xPlayer = ESX.GetPlayerFromId(src)
+        if not xPlayer then return false end
         xPlayer.removeAccountMoney(acct, amt)
     end,
 
     getAccountBalance = function(src, acct)
         local src = src or source
         local xPlayer = ESX.GetPlayerFromId(src)
+        if not xPlayer then return false end
         return xPlayer.getAccount(acct).money
     end,
 

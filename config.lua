@@ -12,7 +12,7 @@ Cfg = {
     Server = {
         language = 'en',          -- Determines the language. ('en': English, 'es': Spanish, 'fr': French, 'de': German, 'pt': Portuguese, 'zh': Chinese)
         notification = 'default', -- Determines the notification system. ('default', 'ox', 'custom': can be customized in bridge/framework/YOURFRAMEWORK)
-        interaction = 'item',     -- Determines wether opening the trap phone is through an item or command. ('item' or 'command')
+        interaction = 'command',     -- Determines wether opening the trap phone is through an item or command. ('item' or 'command')
         command = 'dealer',       -- Determines the command to open the trap phone. (e.g. 'dealer')
         versionCheck = true,      -- Enables version checking to see if the resource is up to date.
     },
