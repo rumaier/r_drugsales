@@ -12,7 +12,7 @@ Cfg = {
     Server = {
         language = 'en',          -- Determines the language. ('en': English, 'es': Spanish, 'fr': French, 'de': German, 'pt': Portuguese, 'zh': Chinese)
         notification = 'default', -- Determines the notification system. ('default', 'ox', 'custom': can be customized in bridge/framework/YOURFRAMEWORK)
-        interaction = 'command',     -- Determines wether opening the trap phone is through an item or command. ('item' or 'command')
+        interaction = 'item',     -- Determines wether opening the trap phone is through an item or command. ('item' or 'command')
         command = 'dealer',       -- Determines the command to open the trap phone. (e.g. 'dealer')
         versionCheck = true,      -- Enables version checking to see if the resource is up to date.
     },
@@ -38,7 +38,7 @@ Cfg = {
     -- |___/\___|_|_|_|_| |_|\__, |
     --                       |___/
     Selling = {
-        minPolice = 1,                -- Determines the minimum police required to sell drugs.
+        minPolice = 0,                -- Determines the minimum police required to sell drugs.
         streetSales = 'pool',         -- Determines if street sale peds are fetched from the pool or spawned. ('pool' or 'spawn')
         poolDistance = 100,           -- Determines the distance from the player to fetch street sale peds. Would recommend 100.
         pedFrequency = { 5, 10 },     -- Determines the frequency of ped spawning/fetching in seconds. (min, max)

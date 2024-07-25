@@ -43,15 +43,11 @@ lib.callback.register('r_drugsales:streetSale', function(src, playerNetId, custo
 end)
 
 lib.callback.register('r_drugsales:bulkSale', function(src, playerNetId, customerNetId, itemInfo)
-    print('args:', src, playerNetId, customerNetId, itemInfo)
     local saleStep = lib.callback.await('r_drugsales:getSaleStep', src)
     local playerItem = Inventory.getPlayerItem(src, itemInfo.name)
     local player, customer = NetworkGetEntityFromNetworkId(playerNetId), NetworkGetEntityFromNetworkId(customerNetId)
     local playerCoords, customerCoords = GetEntityCoords(player), GetEntityCoords(customer)
     local distance = #(playerCoords - customerCoords)
-    print('distance:', distance, playerCoords, customerCoords)
-    print('saleStep:', saleStep)
-    print('playerItem:', playerItem)
     if distance > 10 then DropPlayer(src, _L('cheater')) return false end
     if saleStep ~= 3 then DropPlayer(src, _L('cheater')) return false end
     if not playerItem or playerItem < Cfg.Selling.bulkQuantity[1] then return false end

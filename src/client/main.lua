@@ -106,6 +106,7 @@ end
 local function initializeBulkSale()
     local playerInventory = lib.callback.await('r_drugsales:getPlayerInventory', false)
     for _, slot in pairs(playerInventory) do
+        if GetResourceState('qb-inventory') == 'started' then slot.count = slot.amount end
         if Cfg.Selling.drugs[slot.name] then
             if slot.count >= Cfg.Selling.bulkQuantity[1] then
                 PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)
@@ -329,7 +330,7 @@ local function initializeDealerMenu()
     local isCop = lib.callback.await('r_drugsales:checkIfPolice', false)
     local copCount = lib.callback.await('r_drugsales:getPoliceOnline', false)
     if state.sellingDrugs then return Framework.notify(_L('already_selling'), 'error') end
-    if isCop then return Framework.notify(_L('no_narcs'), 'error') end
+    -- if isCop then return Framework.notify(_L('no_narcs'), 'error') end
     if copCount < Cfg.Selling.minPolice then return Framework.notify(_L('no_police'), 'error') end
     lib.registerContext({
         id = 'dealermenu',

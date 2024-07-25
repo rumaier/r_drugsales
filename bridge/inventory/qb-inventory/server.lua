@@ -19,13 +19,14 @@ Inventory = {
 
     removePlayerItem = function(src, item, qty)
         local src = src or source
-        exports['qb-inventory']:RemoveItem(src, item.name, qty)
+        print(src, item, qty)
+        exports['qb-inventory']:RemoveItem(src, item, qty)
     end,
 
     getPlayerItem = function(src, item, metadata)
         local src = src or source
         local hasItems = exports['qb-inventory']:GetItemsByName(src, item)
-        return hasItems.amount
+        return hasItems[1].amount
     end,
 
     getPlayerInventory = function(src)
