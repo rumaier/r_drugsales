@@ -97,7 +97,7 @@ end
 
 local function checkVersion()
     if not Cfg.Server.versionCheck then return end
-    local url = 'https://api.github.com/repos/rumaier/r_communityservice/releases/latest'
+    local url = 'https://api.github.com/repos/rumaier/r_drugsales/releases/latest'
     local current = GetResourceMetadata(GetCurrentResourceName(), 'version', 0)
     PerformHttpRequest(url, function(err, text, headers)
         if err == 200 then
