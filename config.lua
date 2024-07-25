@@ -5,67 +5,89 @@
 -- |_|___\__,_|_|   \__,_|\__, |___/\__,_|_|\___||___/
 --  |_____|               |___/
 Cfg = {
-    -- Server options
-    Notification = 'default', -- Determines the notification system. ('default', 'ox', 'custom': can be customized in bridge/"FRAMEWORK")
-    Interaction = 'item',     -- Determines how players will open the Dealer Menu. ('item' or 'command') MUST HAVE ITEM INSTALLED FOR 'item'!!
-
-    -- Dispatch Options
-    Dispatch = 'linden_outlawalert', -- Determines the dispatch system. ('linden_outlawalert', 'cd_dispatch', 'rcore_dispatch', 'core_dispatch', 'custom': can be customized in bridge/dispatch. false to disable. )
-    ReportOdds = 10,                 -- Determines the percentage chance of the police being notified when a sale occurs. (Default: 10)
-
-    -- Selling Options
-    Drugs = {                                -- Determines drugs that can be sold. Add as many as you like.
-        ['cannabis'] = {                     -- Item Name
-            Street = { Min = 15, Max = 20 }, -- Street Price
-            Bulk = { Min = 5, Max = 10 },    -- Bulk Price
+    --  ___  ___ _ ____   _____ _ __
+    -- / __|/ _ \ '__\ \ / / _ \ '__|
+    -- \__ \  __/ |   \ V /  __/ |
+    -- |___/\___|_|    \_/ \___|_|
+    Server = {
+        language = 'en',          -- Determines the language. ('en': English, 'es': Spanish, 'fr': French, 'de': German, 'pt': Portuguese, 'zh': Chinese)
+        notification = 'default', -- Determines the notification system. ('default', 'ox', 'custom': can be customized in bridge/framework/YOURFRAMEWORK)
+        interaction = 'item',     -- Determines wether opening the trap phone is through an item or command. ('item' or 'command')
+        command = 'dealer',       -- Determines the command to open the trap phone. (e.g. 'dealer')
+        versionCheck = true,      -- Enables version checking to see if the resource is up to date.
+    },
+    --      _ _                 _       _
+    --   __| (_)___ _ __   __ _| |_ ___| |__
+    --  / _` | / __| '_ \ / _` | __/ __| '_ \
+    -- | (_| | \__ \ |_) | (_| | || (__| | | |
+    --  \__,_|_|___/ .__/ \__,_|\__\___|_| |_|
+    --             |_|
+    Dispatch = {
+        resource = 'linden_outlawalert', -- Determines the dispatch system. ('linden_outlawalert', 'ps-dispatch', 'cd_dispatch', 'rcore_dispatch', 'custom': can be customized in bridge/dispatch. false to disable. )
+        notifyOnReject = true,           -- Determines if police are notified on bad sales.
+        reportOdds = 50,                 -- Determines the percent chance of a bad sale resulting in police being notified. (1-100)
+        policeJobs = {                   -- Determines the police jobs that can be notified. (e.g. 'police', 'sheriff')
+            'police',
+            -- 'sheriff',
         },
-        ['cocaine'] = {
-            Street = { Min = 25, Max = 30 },
-            Bulk = { Min = 10, Max = 20 },
+    },
+    --           _ _ _
+    --  ___  ___| | (_)_ __   __ _
+    -- / __|/ _ \ | | | '_ \ / _` |
+    -- \__ \  __/ | | | | | | (_| |
+    -- |___/\___|_|_|_|_| |_|\__, |
+    --                       |___/
+    Selling = {
+        minPolice = 1,                -- Determines the minimum police required to sell drugs.
+        streetSales = 'pool',         -- Determines if street sale peds are fetched from the pool or spawned. ('pool' or 'spawn')
+        poolDistance = 100,           -- Determines the distance from the player to fetch street sale peds. Would recommend 100.
+        pedFrequency = { 5, 10 },     -- Determines the frequency of ped spawning/fetching in seconds. (min, max)
+        rejectChance = 10,            -- Determines the percent chance of a rejected sale. (1-100)
+        robberyChance = 10,           -- Determines the percent chance of a robbery attempt, if sale is rejected. (1-100)
+        streetQuantity = { 1, 3 },    -- Determines the quantity of drugs bought by street sale peds. (min, max)
+        bulkQuantity = { 750, 1000 }, -- Determines the quantity of drugs bought by bulk sale peds. (min, max)
+        bulkMeetTime = 10,            -- Determines the time in minutes you have to reach the meetup location.
+        account = 'black_money',      -- Determines the account to deposit money into.
+        drugs = {                     -- Determines drugs that can be sold. Add as many as you like.
+            ['weed'] = {              -- Item Name
+                street = { 15, 20 },  -- Street Price (min, max)
+                bulk = { 5, 10 },     -- Bulk Price (min, max)
+            },
+            ['cocaine'] = {
+                street = { 25, 30 },
+                bulk = { 10, 15 },
+            },
+            ['meth'] = {
+                street = { 35, 40 },
+                bulk = { 15, 20 },
+            },
         },
-        ['meth'] = {
-            Street = { Min = 40, Max = 60 },
-            Bulk = { Min = 15, Max = 25 },
-        }
+        meetupCoords = { -- Determines the coordinates of the meetup locations on bulk sales.
+            vec4(201.06, -2000.82, 17.86, 230.26),
+            vec4(414.41, -2051.13, 21.22, 141.53),
+            vec4(-40.83, -773.20, 32.09, 166.32),
+            vec4(362.78, -1649.05, 26.25, 137.77),
+            vec4(438.06, -1318.53, 30.06, 231.25),
+            vec4(485.18, -1504.54, 28.29, 212.42),
+            vec4(696.86, -1010.63, 21.81, 92.86),
+            vec4(1113.79, -637.59, 55.81, 30.81),
+            vec4(1050.93, -791.13, 57.22, 102.52),
+            vec4(1112.31, -330.16, 66.06, 125.32),
+            vec4(1114.68, 2641.64, 37.14, 8.76),
+            vec4(634.57, 2779.24, 41.02, 273.88),
+            vec4(1718.71, 3294.62, 40.21, 169.61),
+            vec4(2536.57, 2640.39, 36.95, 275.86),
+            vec4(-1578.73, -969.49, 12.01, 142.17)
+        },
     },
-
-    MinPolice = 0, -- Determines the minimum amount of police for players to sell. Set to 0 to disable.
-    PoliceJobs = {
-        'police',
-        --      'sheriff',
-    },
-    Account = 'black_money',               -- Determines the account players will be paid to upon sale.
-    StreetSelling = 'pool',                -- Determines the street selling method. ('pool': grabs nearest NPC, 'spawn': spawns a ped 20 units away.)
-    PoolDistance = 100,                    -- Determines the distance it will pull peds from when in StreetSelling = 'pool'. Wouldn't recommend going over 100.
-    PedFrequency = { Min = 15, Max = 20 }, -- Determines how many seconds between either a ped is grabbed or spawned.
-    StreetSale = { Min = 1, Max = 5 },     -- Determines the max amount of drugs sold per street sale.
-    BulkSale = { Min = 750, Max = 1000 },  -- Determines the minimum amount needed for a bulk sale.
-    RejectChance = 10,                     -- Determines the percentage chance a customer will reject whatever drug you have when street selling.
-    NotifyPoliceOnReject = true,           -- Determines if the police will be notified upon a rejected sale.
-
-    MeetupCoords = {                       -- Determines where the ped will spawn when meeting for bulk sales. Can add as many as you like.
-        vec4(201.06, -2000.82, 17.86, 230.26),
-        vec4(414.41, -2051.13, 21.22, 141.53),
-        vec4(-40.83, -773.20, 32.09, 166.32),
-        vec4(362.78, -1649.05, 26.25, 137.77),
-        vec4(438.06, -1318.53, 30.06, 231.25),
-        vec4(485.18, -1504.54, 28.29, 212.42),
-        vec4(696.86, -1010.63, 21.81, 92.86),
-        vec4(1113.79, -637.59, 55.81, 30.81),
-        vec4(1050.93, -791.13, 57.22, 102.52),
-        vec4(1112.31, -330.16, 66.06, 125.32),
-        vec4(1114.68, 2641.64, 37.14, 8.76),
-        vec4(634.57, 2779.24, 41.02, 273.88),
-        vec4(1718.71, 3294.62, 40.21, 169.61),
-        vec4(2536.57, 2640.39, 36.95, 275.86),
-        vec4(-1578.73, -969.49, 12.01, 142.17)
-    },
-
-    -- Sell Zone Options
-    SellZones = {
-        Enabled = true, -- Toggles wether the sell zone feature is enabled or disabled.
-        Zones = {       -- You can add as many zones as you like, following formatting. (https://overextended.dev/ox_lib/Modules/Zones/Shared#zone-creation-script)
-            { 
+    --  _______  _ __   ___  ___
+    -- |_  / _ \| '_ \ / _ \/ __|
+    --  / / (_) | | | |  __/\__ \
+    -- /___\___/|_| |_|\___||___/
+    Zones = {
+        enabled = true,                        -- Determines if the sell zones feature is enabled.
+        zoneCoords = {                         -- You can add as many zones as you like, following formatting. (https://overextended.dev/ox_lib/Modules/Zones/Shared#zone-creation-script)
+            {
                 vec3(123.16, -1937.44, 20.72), -- This zone covers most of the Grove area.
                 vec3(122.71, -1945.11, 20.72),
                 vec3(118.69, -1952.93, 20.72),
@@ -107,47 +129,62 @@ Cfg = {
                 vec3(311.77, -2129.07, 15.00)
             },
         },
-        Debug = false -- If you don't know what this is, leave it false.
     },
-
-    -- Ped Options
-    StreetPeds = { -- Ped models for street sales when StreetSelling = 'spawn'.
-        'a_f_m_downtown_01',
-        'a_f_m_salton_01',
-        'a_f_m_tramp_01',
-        'a_f_m_trampbeac_01',
-        'a_m_m_hillbilly_02',
-        'a_m_m_rurmeth_01',
-        'a_m_m_salton_01',
-        'a_m_m_salton_03',
-        'a_m_m_skidrow_01',
-        'a_m_m_soucent_01',
-        'a_m_m_soucent_03',
-        'a_m_m_tramp_01',
-        'a_m_m_trampbeac_01',
-        'a_m_o_acult_02',
-        'a_m_o_soucent_02',
-        'a_m_o_soucent_03',
-        'a_m_o_tramp_01',
-        'a_m_y_juggalo_01',
-        'a_m_y_methhead_01',
-        'a_m_y_salton_01',
-        'cs_ashley',
-        'cs_nervousron',
-        'cs_omega',
-        'cs_taocheng',
-        'g_m_importexport_01',
-        'cs_wade'
+    --                 _
+    --  _ __   ___  __| |___
+    -- | '_ \ / _ \/ _` / __|
+    -- | |_) |  __/ (_| \__ \
+    -- | .__/ \___|\__,_|___/
+    -- |_|
+    Peds = {
+        streetPeds = {
+            'a_f_m_downtown_01',
+            'a_f_m_salton_01',
+            'a_f_m_tramp_01',
+            'a_f_m_trampbeac_01',
+            'a_m_m_hillbilly_02',
+            'a_m_m_rurmeth_01',
+            'a_m_m_salton_01',
+            'a_m_m_salton_03',
+            'a_m_m_skidrow_01',
+            'a_m_m_soucent_01',
+            'a_m_m_soucent_03',
+            'a_m_m_tramp_01',
+            'a_m_m_trampbeac_01',
+            'a_m_o_acult_02',
+            'a_m_o_soucent_02',
+            'a_m_o_soucent_03',
+            'a_m_o_tramp_01',
+            'a_m_y_juggalo_01',
+            'a_m_y_methhead_01',
+            'a_m_y_salton_01',
+            'cs_ashley',
+            'cs_nervousron',
+            'cs_omega',
+            'cs_taocheng',
+            'g_m_importexport_01',
+            'cs_wade'
+        },
+        bulkPeds = {
+            'a_m_m_malibu_01',
+            'a_m_m_og_boss_01',
+            'cs_lamardavis',
+            'csb_hao',
+            'csb_g',
+            'g_m_y_korlieut_01',
+            'g_m_y_salvaboss_01',
+            's_m_y_dealer_01',
+        },
     },
-
-    BulkPeds = { -- Ped models for bulk sales
-        'a_m_m_malibu_01',
-        'a_m_m_og_boss_01',
-        'cs_lamardavis',
-        'csb_hao',
-        'csb_g',
-        'g_m_y_korlieut_01',
-        'g_m_y_salvaboss_01',
-        's_m_y_dealer_01',
+    --      _      _
+    --   __| | ___| |__  _   _  __ _
+    --  / _` |/ _ \ '_ \| | | |/ _` |
+    -- | (_| |  __/ |_) | |_| | (_| |
+    --  \__,_|\___|_.__/ \__,_|\__, |
+    --                         |___/
+    Debug = {
+        prints = false,  -- Enables debug prints, not recommended for production.
+        targets = false, -- Enables debug targets, not recommended for production.
+        zones = false   -- Enables debug zones, not recommended for production.
     }
 }

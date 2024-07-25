@@ -1,4 +1,5 @@
 if GetResourceState('ox_target') ~= 'started' then return end
+
 local ox_target = exports.ox_target
 
 Target = {
@@ -6,8 +7,8 @@ Target = {
         ox_target:addLocalEntity(entities, options)
     end,
 
-    removeLocalEntity = function(entities)
-        ox_target:removeLocalEntity(entities)
+    addModel = function(models, options)
+        ox_target:addModel(models, options)
     end,
 
     addBoxZone = function(name, coords, size, heading, options)
@@ -15,8 +16,20 @@ Target = {
             coords = coords,
             size = size,
             rotation = heading,
-            debug = Cfg.Debug,
+            debug = Cfg.Debug.targets,
             options = options
         })
+    end,
+
+    removeLocalEntity = function(entity)
+        ox_target:removeLocalEntity(entity)
+    end,
+
+    removeModel = function(model)
+        ox_target:removeModel(model)
+    end,
+
+    removeZone = function(name)
+        ox_target:removeZone(name)
     end
 }
