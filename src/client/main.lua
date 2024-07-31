@@ -38,6 +38,7 @@ local function initiateBulkSale(slot)
         TaskWanderStandard(entities.customer, 10.0, 10)
         RemovePedElegantly(entities.customer)
         debug('[DEBUG] - Sale successful:', quantity, slot.label, pay)
+        state.sellingDrugs = false
         saleStep = 0
     end)
 end
