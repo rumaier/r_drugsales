@@ -36,7 +36,7 @@ lib.callback.register('r_drugsales:streetSale', function(src, playerNetId, custo
     if saleStep ~= 3 then DropPlayer(src, _L('cheater')) return false end
     if not playerItem or playerItem < Cfg.Selling.streetQuantity[1] then return false end
     local quantity = math.random(Cfg.Selling.streetQuantity[1], math.min(Cfg.Selling.streetQuantity[2], playerItem))
-    local pay = math.random(Cfg.Selling.drugs[itemInfo.name].street[1], Cfg.Selling.drugs[itemInfo.name].street[2])
+    local pay = math.random(Cfg.Selling.drugs[itemInfo.name].street[1], Cfg.Selling.drugs[itemInfo.name].street[2]) * quantity
     Inventory.removePlayerItem(src, itemInfo.name, quantity)
     Framework.addAccountMoney(src, Cfg.Selling.account, pay)
     return true, quantity, pay
@@ -52,7 +52,7 @@ lib.callback.register('r_drugsales:bulkSale', function(src, playerNetId, custome
     if saleStep ~= 3 then DropPlayer(src, _L('cheater')) return false end
     if not playerItem or playerItem < Cfg.Selling.bulkQuantity[1] then return false end
     local quantity = math.random(Cfg.Selling.bulkQuantity[1], playerItem)
-    local pay = math.random(Cfg.Selling.drugs[itemInfo.name].bulk[1], Cfg.Selling.drugs[itemInfo.name].bulk[2])
+    local pay = math.random(Cfg.Selling.drugs[itemInfo.name].bulk[1], Cfg.Selling.drugs[itemInfo.name].bulk[2]) * quantity
     Inventory.removePlayerItem(src, itemInfo.name, quantity)
     Framework.addAccountMoney(src, Cfg.Selling.account, pay * quantity)
     return true, quantity, pay
