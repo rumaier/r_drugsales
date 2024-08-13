@@ -217,7 +217,7 @@ local function initiateStreetSale(slot)
             local customerNetId = NetworkGetNetworkIdFromEntity(entities.customer)
             local paid, quantity, pay = lib.callback.await('r_drugsales:streetSale', false, playerNetId, customerNetId, slot)
             if not paid then return CancelSelling() end
-            Framework.notify(_L('sold_drugs', quantity, slot.label, pay), 'success')
+            Framework.notify(_L('sold_drugs', quantity, slot.label, pay * quantity), 'success')
             PlayPedAmbientSpeechNative(entities.customer, 'Generic_Thanks', 'Speech_Params_Force')
             TaskWanderStandard(entities.customer, 10.0, 10)
             RemovePedElegantly(entities.customer)
