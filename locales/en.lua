@@ -22,6 +22,7 @@ Language['en'] = { -- English
     sold_drugs = 'You sold %sx %s for $%s.',
     rejected_sale = 'I don\'t want that bullshit!',
     robbed = 'Fake Cash?! Chase that thief!',
+    got_away = 'They got away! RIP those drugs!',
     retrieved_drugs = 'You retrieved %sx %s.',
 
     -- Blip Labels

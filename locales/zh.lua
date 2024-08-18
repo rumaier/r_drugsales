@@ -22,6 +22,7 @@ Language['zh'] = { -- Chinese
     sold_drugs = '你卖了 %sx %s 赚了 $%s。',
     rejected_sale = '我不想要那种垃圾！',
     robbed = '假钱？！追那个小偷！',
+    got_away = '他们逃走了！R.I.P. 这些毒品。',
     retrieved_drugs = '你取回了 %sx %s。',
 
     -- Blip Labels

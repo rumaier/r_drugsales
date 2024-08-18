@@ -22,6 +22,7 @@ Language['es'] = { -- Spanish
     sold_drugs = 'Has vendido %sx %s por $%s.',
     rejected_sale = '¡No quiero esa porquería!',
     robbed = '¿Dinero falso? ¡Persigue a ese ladrón!',
+    got_away = '¡Se escaparon! R.I.P. esas drogas.',
     retrieved_drugs = 'Has recuperado %sx %s.',
 
     -- Blip Labels
