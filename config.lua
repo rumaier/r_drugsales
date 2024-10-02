@@ -23,7 +23,6 @@ Cfg = {
     --  \__,_|_|___/ .__/ \__,_|\__\___|_| |_|
     --             |_|
     Dispatch = {
-        resource = 'linden_outlawalert', -- Determines the dispatch system. ('linden_outlawalert', 'ps-dispatch', 'cd_dispatch', 'rcore_dispatch', 'custom': can be customized in bridge/dispatch. false to disable. )
         notifyOnReject = true,           -- Determines if police are notified on bad sales.
         reportOdds = 50,                 -- Determines the percent chance of a bad sale resulting in police being notified. (1-100)
         policeJobs = {                   -- Determines the police jobs that can be notified. (e.g. 'police', 'sheriff')
@@ -38,11 +37,11 @@ Cfg = {
     -- |___/\___|_|_|_|_| |_|\__, |
     --                       |___/
     Selling = {
-        minPolice = 0,                -- Determines the minimum police required to sell drugs.
+        minPolice = 1,                -- Determines the minimum police required to sell drugs.
         streetSales = 'pool',         -- Determines if street sale peds are fetched from the pool or spawned. ('pool' or 'spawn')
         poolDistance = 100,           -- Determines the distance from the player to fetch street sale peds. Would recommend 100.
         pedFrequency = { 5, 10 },     -- Determines the frequency of ped spawning/fetching in seconds. (min, max)
-        rejectChance = 10,            -- Determines the percent chance of a rejected sale. (1-100)
+        rejectChance = 99,            -- Determines the percent chance of a rejected sale. (1-100)
         robberyChance = 10,           -- Determines the percent chance of a robbery attempt, if sale is rejected. (1-100)
         streetQuantity = { 1, 3 },    -- Determines the quantity of drugs bought by street sale peds. (min, max)
         bulkQuantity = { 750, 1000 }, -- Determines the quantity of drugs bought by bulk sale peds. (min, max)
@@ -182,9 +181,5 @@ Cfg = {
     -- | (_| |  __/ |_) | |_| | (_| |
     --  \__,_|\___|_.__/ \__,_|\__, |
     --                         |___/
-    Debug = {
-        prints = false,  -- Enables debug prints, not recommended for production.
-        targets = false, -- Enables debug targets, not recommended for production.
-        zones = false   -- Enables debug zones, not recommended for production.
-    }
+    Debug = true -- Enables debug mode. (DO NOT ENABLE IN PRODUCTION)
 }

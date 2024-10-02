@@ -6,33 +6,31 @@ lua54 'yes'
 name 'r_drugsales'
 description 'A Drug Selling System'
 author 'r_scripts'
-version '2.0.3'
+version '2.0.4'
 
 shared_scripts {
     '@ox_lib/init.lua',
+    'utils/shared.lua',
     'locales/*.lua',
-    'src/shared/*.lua',
     'config.lua',
 }
 
 server_scripts {
-    '@oxmysql/lib/MySQL.lua',
-    'bridge/**/server.lua',
+    'utils/server.lua',
     'src/server/*.lua',
 }
 
 client_scripts {
-    'bridge/**/client.lua',
+    'utils/client.lua',
     'src/client/*.lua',
 }
 
 dependencies {
     'ox_lib',
-    'oxmysql',
+    'r_bridge',
 }
 
 escrow_ignore {
-    "bridge/**/**/*.*",
     'install/**/*.*',
     'locales/*.*',
     'config.*' 

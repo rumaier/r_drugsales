@@ -1,4 +1,3 @@
-Core = {}
 Language = Language or {}
 
 ---@param str string -- Name of the string to pull from the locale file
