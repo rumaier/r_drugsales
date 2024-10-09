@@ -62,9 +62,11 @@ AddEventHandler('onResourceStart', function(resource)
     if (GetCurrentResourceName() == resource) then
         print('------------------------------')
         print(_L('version', resource, GetResourceMetadata(resource, 'version', 0)))
-        print(_L('framework', Core.Info.Framework))
-        print(_L('inventory', Core.Info.Inventory))
-        print(_L('target', Core.Info.Target))
+        if GetResourceState('r_bridge') ~= 'started' then
+            print('^1Bridge not detected, please ensure it is running.^0')
+        else
+            print('^2Bridge detected and loaded.^0')
+        end
         print('------------------------------')
         checkVersion()
     end
