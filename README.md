@@ -18,6 +18,7 @@ This is a script designed to be a versatile way for players in your server to se
 
 ## Dependencies
 
+- [r_bridge](https://github.com/rumaier/r_bridge/releases)
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
 - [ox_target](https://github.com/overextended/ox_target/releases) or [qb-target](https://github.com/qbcore-framework/qb-target)
 - [es_extended](https://github.com/esx-framework) or [qb-core](https://github.com/qbcore-framework)
