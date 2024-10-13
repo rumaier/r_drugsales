@@ -12,7 +12,7 @@ lib.callback.register('r_drugsales:getPoliceOnline', function(src)
     local count = 0
     local players = GetPlayers()
     for _, playerId in ipairs(players) do
-        local job = Core.Framework.GetPlayerJob(playerId)
+        local job = Core.Framework.GetPlayerJob(tonumber(playerId))
         for _, policeJob in pairs(Cfg.Dispatch.policeJobs) do
             if job == policeJob then
                 count = count + 1
