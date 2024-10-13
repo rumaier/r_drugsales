@@ -37,11 +37,11 @@ Cfg = {
     -- |___/\___|_|_|_|_| |_|\__, |
     --                       |___/
     Selling = {
-        minPolice = 1,                -- Determines the minimum police required to sell drugs.
+        minPolice = 0,                -- Determines the minimum police required to sell drugs.
         streetSales = 'pool',         -- Determines if street sale peds are fetched from the pool or spawned. ('pool' or 'spawn')
         poolDistance = 100,           -- Determines the distance from the player to fetch street sale peds. Would recommend 100.
         pedFrequency = { 5, 10 },     -- Determines the frequency of ped spawning/fetching in seconds. (min, max)
-        rejectChance = 99,            -- Determines the percent chance of a rejected sale. (1-100)
+        rejectChance = 10,            -- Determines the percent chance of a rejected sale. (1-100)
         robberyChance = 10,           -- Determines the percent chance of a robbery attempt, if sale is rejected. (1-100)
         streetQuantity = { 1, 3 },    -- Determines the quantity of drugs bought by street sale peds. (min, max)
         bulkQuantity = { 750, 1000 }, -- Determines the quantity of drugs bought by bulk sale peds. (min, max)
