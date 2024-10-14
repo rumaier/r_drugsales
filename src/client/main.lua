@@ -1,5 +1,5 @@
 local entities = {}
-local meetBlip = nil
+local meetBlip = false
 local saleStep = 0
 
 local state = LocalPlayer.state
@@ -33,7 +33,7 @@ local function initiateBulkSale(slot)
         DeleteEntity(entities.cash)
         local paid, quantity, pay = lib.callback.await('r_drugsales:bulkSale', false, playerNetId, customerNetId, slot)
         if not paid then debug('[DEBUG] - Sale failed:', paid, quantity, pay) return CancelSelling() end
-        Core.Framework.Notify(_L('sold_drugs', quantity, slot.label, pay * quantity), 'success')
+        Core.Framework.Notify(_L('sold_drugs', quantity, slot.label, pay), 'success')
         PlayPedAmbientSpeechNative(entities.customer, 'Generic_Thanks', 'Speech_Params_Force')
         SetEntityAsNoLongerNeeded(entities.bag)
         TaskWanderStandard(entities.customer, 10.0, 10)
@@ -68,7 +68,8 @@ local function setupBulkSale(slot, coords)
         if distance <= 5.0 then
             PlayPedAmbientSpeechNative(entities.customer, 'Generic_Hows_It_Going', 'Speech_Params_Force')
             Core.Natives.SetGpsRoute(false)
-            RemoveBlip(meetBlip)
+            Core.Natives.RemoveBlip(meetBlip)
+            meetBlip = false
             debug('[DEBUG] - Player approached meetup')
             break
         end
@@ -380,7 +381,7 @@ function CancelSelling()
     entities.customer = nil
     saleStep = 0
     Core.Natives.SetGpsRoute(false)
-    RemoveBlip(meetBlip)
+    Core.Natives.RemoveBlip(meetBlip)
 end
 
 function GetNearbyPed()
