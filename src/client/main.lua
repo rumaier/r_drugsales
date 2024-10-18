@@ -223,7 +223,7 @@ local function initiateStreetSale(slot)
             return TaskStreetSale(slot)
         elseif reject and not robbery then
             local roll = math.random(1, 100)
-            if roll <= Cfg.Dispatch.reportOdds then Core.Dispatch.TriggerDispatch(Cfg.Dispatch.policeJobs) end
+            if roll <= Cfg.Dispatch.reportOdds then TriggerDispatch() end
             Core.Framework.Notify(_L('rejected_sale'), 'error')
             PlayPedAmbientSpeechNative(entities.customer, 'Generic_Insult_High', 'Speech_Params_Force')
             TaskWanderStandard(entities.customer, 10.0, 10)

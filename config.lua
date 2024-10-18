@@ -23,6 +23,7 @@ Cfg = {
     --  \__,_|_|___/ .__/ \__,_|\__\___|_| |_|
     --             |_|
     Dispatch = {
+        resource = 'linden_outlawalert', -- 'linden_outlawalert', 'ps-dispatch', 'cd_dispatch', 'rcore_dispatch', 'custom' (client/dispatch.lua), false to disable
         notifyOnReject = true,           -- Determines if police are notified on bad sales.
         reportOdds = 50,                 -- Determines the percent chance of a bad sale resulting in police being notified. (1-100)
         policeJobs = {                   -- Determines the police jobs that can be notified. (e.g. 'police', 'sheriff')
