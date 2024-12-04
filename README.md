@@ -16,27 +16,10 @@ This is a script designed to be a versatile way for players in your server to se
 - 👮 Configurable police requirement, dispatch and alert odds.
 - ➕ AND MORE!!
 
-## Dependencies
-
-- [r_bridge](https://github.com/rumaier/r_bridge/releases)
-- [ox_lib](https://github.com/overextended/ox_lib/releases)
-- [ox_target](https://github.com/overextended/ox_target/releases) or [qb-target](https://github.com/qbcore-framework/qb-target)
-- [es_extended](https://github.com/esx-framework) or [qb-core](https://github.com/qbcore-framework)
-
-## Installation
-
-1. Download the script files
-2. Place them in your FiveM server's resources folder
-3. Ensure all dependencies are installed
-4. Install `r_trapphone` item (optional)
-5. Add `ensure r_drugsales` to your server.cfg
-6. Configure your servers drugs and dispatch in config.lua
-7. Restart Server and Enjoy!
-
 ## Documentation
 
-- [Gitbook](https://r-scripts-1.gitbook.io/r_scripts-docs./r_drugsales)
+[Gitbook](https://r-scripts-1.gitbook.io/r_scripts-docs./)
 
 ## Support
 
-- [Discord](https://discord.gg/8TzrRRheV5)
+[Discord](https://discord.gg/r-scripts)
