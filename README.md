@@ -18,7 +18,7 @@ This is a script designed to be a versatile way for players in your server to se
 
 ## Documentation
 
-[Gitbook](https://r-scripts-1.gitbook.io/r_scripts-docs./)
+[Gitbook](https://r-scripts-1.gitbook.io/r_scripts-docs./free-resources/r_drugsales)
 
 ## Support
 
