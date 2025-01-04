@@ -35,21 +35,10 @@ function SendWebhook(src, event, ...)
     }), { ['Content-Type'] = 'application/json' })
 end
 
-local function checkVersion()
+local function checkResourceVersion()
     if not Cfg.Server.VersionCheck then return end
-    local url = 'https://api.github.com/repos/rumaier/r_drugsales/releases/latest'
-    local current = GetResourceMetadata(GetCurrentResourceName(), 'version', 0)
-    PerformHttpRequest(url, function(err, text, headers)
-        if err == 200 then
-            local data = json.decode(text)
-            local latest = data.tag_name
-            if latest ~= current then
-                print('[^3WARNING^0] '.. _L('update', GetCurrentResourceName()))
-                print('[^3WARNING^0] https://github.com/rumaier/r_drugsales/releases/tag/2.0.4 ^0')
-            end
-        end
-    end, 'GET', '', { ['Content-Type'] = 'application/json' })
-    SetTimeout(3600000, checkVersion)
+    Core.VersionCheck(GetCurrentResourceName())
+    SetTimeout(3600000, checkResourceVersion)
 end
 
 function debug(...)
@@ -68,6 +57,6 @@ AddEventHandler('onResourceStart', function(resource)
             print('^2Bridge detected and loaded.^0')
         end
         print('------------------------------')
-        checkVersion()
+        checkResourceVersion()
     end
 end)

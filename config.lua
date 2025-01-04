@@ -181,5 +181,5 @@ Cfg = {
     -- | (_| |  __/ |_) | |_| | (_| |
     --  \__,_|\___|_.__/ \__,_|\__, |
     --                         |___/
-    Debug = true -- Enables debug mode. (DO NOT ENABLE IN PRODUCTION)
+    Debug = false -- Enables debug mode. (DO NOT ENABLE IN PRODUCTION)
 }
