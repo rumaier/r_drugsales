@@ -32,13 +32,13 @@ local function initiateBulkSale(slot)
         Wait(500)
         DeleteEntity(entities.cash)
         local paid, quantity, pay = lib.callback.await('r_drugsales:bulkSale', false, playerNetId, customerNetId, slot)
-        if not paid then debug('[DEBUG] - Sale failed:', paid, quantity, pay) return CancelSelling() end
+        if not paid then _debug('[DEBUG] - Sale failed:', paid, quantity, pay) return CancelSelling() end
         Core.Framework.Notify(_L('sold_drugs', quantity, slot.label, pay), 'success')
         PlayPedAmbientSpeechNative(entities.customer, 'Generic_Thanks', 'Speech_Params_Force')
         SetEntityAsNoLongerNeeded(entities.bag)
         TaskWanderStandard(entities.customer, 10.0, 10)
         RemovePedElegantly(entities.customer)
-        debug('[DEBUG] - Sale successful:', quantity, slot.label, pay)
+        _debug('[DEBUG] - Sale successful:', quantity, slot.label, pay)
         state.sellingDrugs = false
         saleStep = 0
     end)
@@ -60,7 +60,7 @@ local function setupBulkSale(slot, coords)
             end
         }
     })
-    debug('[DEBUG] - Bulk customer spawned', entities.customer)
+    _debug('[DEBUG] - Bulk customer spawned', entities.customer)
     while state.sellingDrugs and saleStep == 2 do
         local pCoords = GetEntityCoords(cache.ped)
         local cCoords = GetEntityCoords(entities.customer)
@@ -70,7 +70,7 @@ local function setupBulkSale(slot, coords)
             Core.Natives.SetGpsRoute(false)
             Core.Natives.RemoveBlip(meetBlip)
             meetBlip = false
-            debug('[DEBUG] - Player approached meetup')
+            _debug('[DEBUG] - Player approached meetup')
             break
         end
         Wait(100)
@@ -125,7 +125,7 @@ local function initializeBulkSale()
                     DeleteEntity(entities.phone)
                 end)
                 taskBulkSale(slot, coords)
-                debug('[DEBUG] - Bulk Selling:', coords, json.encode(slot, { indent = true }))
+                _debug('[DEBUG] - Bulk Selling:', coords, json.encode(slot, { indent = true }))
             end)
             return
         end
@@ -218,7 +218,7 @@ local function initiateStreetSale(slot)
             PlayPedAmbientSpeechNative(entities.customer, 'Generic_Thanks', 'Speech_Params_Force')
             TaskWanderStandard(entities.customer, 10.0, 10)
             RemovePedElegantly(entities.customer)
-            debug('[DEBUG] - Sale successful:', quantity, slot.label, pay)
+            _debug('[DEBUG] - Sale successful:', quantity, slot.label, pay)
             saleStep = 0
             return TaskStreetSale(slot)
         elseif reject and not robbery then
@@ -228,12 +228,12 @@ local function initiateStreetSale(slot)
             PlayPedAmbientSpeechNative(entities.customer, 'Generic_Insult_High', 'Speech_Params_Force')
             TaskWanderStandard(entities.customer, 10.0, 10)
             RemovePedElegantly(entities.customer)
-            debug('[DEBUG] - Sale rejected:', slot.label)
+            _debug('[DEBUG] - Sale rejected:', slot.label)
             return TaskStreetSale(slot)
         elseif reject and robbery then
             local robbed, quantity = lib.callback.await('r_drugsales:robPlayer', false, slot)
             if not robbed then return CancelSelling() end
-            debug('[DEBUG] - Robbery initiated:', slot.label)
+            _debug('[DEBUG] - Robbery initiated:', slot.label)
             initiateRobbery(slot, quantity)
         end
     end)
@@ -253,7 +253,7 @@ local function setupStreetSale(slot)
     })
     PlayPedAmbientSpeechNative(entities.customer, 'Generic_Hows_It_Going', 'Speech_Params_Force')
     saleStep = 2
-    debug('[DEBUG] - Customer ready to buy, waiting for player to sell')
+    _debug('[DEBUG] - Customer ready to buy, waiting for player to sell')
     while state.sellingDrugs and saleStep == 2 do
         local pCoords = GetEntityCoords(cache.ped)
         local cCoords = GetEntityCoords(entities.customer)
@@ -282,7 +282,7 @@ function TaskStreetSale(slot)
         end
         while not DoesEntityExist(entities.customer) do Wait(100) end
         saleStep = 1
-        debug('[DEBUG] - Customer ready, tasking to player', entities.customer)
+        _debug('[DEBUG] - Customer ready, tasking to player', entities.customer)
         while state.sellingDrugs and saleStep == 1 do
             local pCoords = GetEntityCoords(cache.ped)
             local cCoords = GetEntityCoords(entities.customer)
@@ -309,7 +309,7 @@ local function initializeStreetSelling()
             PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)
             Core.Framework.Notify(_L('wait_for_customer'), 'info')
             state.sellingDrugs = true
-            debug('[DEBUG] - Selling drugs:', json.encode(slot, { indent = true }))
+            _debug('[DEBUG] - Selling drugs:', json.encode(slot, { indent = true }))
             CloseDealerMenu()
             return TaskStreetSale(slot)
         end
@@ -357,7 +357,7 @@ local function initializeDealerMenu()
             }
         }
     })
-    debug('[DEBUG] - Dealer menu built, opening menu')
+    _debug('[DEBUG] - Dealer menu built, opening menu')
     openDealerMenu()
 end
 
@@ -371,7 +371,7 @@ function CloseDealerMenu()
     SetTimeout(750, function()
         DeleteEntity(entities.phone)
     end)
-    debug('[DEBUG] - Dealer menu closed')
+    _debug('[DEBUG] - Dealer menu closed')
 end
 
 function CancelSelling()
@@ -399,7 +399,7 @@ function GetNearbyPed()
             break
         end
     end
-    debug('[DEBUG] - Nearby ped: ' .. tostring(nearbyPed))
+    _debug('[DEBUG] - Nearby ped: ' .. tostring(nearbyPed))
     return nearbyPed
 end
 
@@ -411,11 +411,11 @@ CreateThread(function()
                 thickness = 50,
                 onEnter = function()
                     state.inSellZone = true
-                    debug('[DEBUG] - Entered sell zone')
+                    _debug('[DEBUG] - Entered sell zone')
                 end,
                 onExit = function()
                     state.inSellZone = false
-                    debug('[DEBUG] - Exited sell zone')
+                    _debug('[DEBUG] - Exited sell zone')
                 end,
                 debug = Cfg.Debug
             })
