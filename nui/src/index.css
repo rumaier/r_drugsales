@@ -1,0 +1,36 @@
+:root, html {
+  font-size: clamp(1rem, calc(0.0625rem + 1.389vh), 1.3125rem);
+  color-scheme: normal;
+}
+
+body {
+  height: 100vh;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+*:focus {
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 0.4rem;
+  height: 100%;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: var(--mantine-radius-sm);
+  background: var(--mantine-color-dark-7); 
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: var(--mantine-radius-sm);
+  background: var(--mantine-primary-color-6); 
+  cursor:pointer;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mantine-primary-color-7); 
+}

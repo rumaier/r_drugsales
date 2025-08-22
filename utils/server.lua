@@ -1,62 +1,64 @@
-Core = exports['r_bridge']:returnCoreObject()
+Core = exports.r_bridge:returnCoreObject()
 
-function SendWebhook(src, event, ...)
-    if not Cfg.Webhook.Enabled then return end
-    local name = '' if src > 0 then name = GetPlayerName(src) end
-    local identifier = Core.Framework.GetPlayerIdentifier(src) or ''
-    PerformHttpRequest(Cfg.Webhook.Url, function(err, text, headers)
-    end, 'POST', json.encode({
-        username = 'Resource Logs',
-        avatar_url = 'https://i.ibb.co/z700S5H/square.png',
-        embeds = {
-            {
-                color = 0x2C1B47,
-                title = event,
-                author = {
-                    name = GetCurrentResourceName(),
-                    icon_url = 'https://i.ibb.co/z700S5H/square.png',
-                    url = 'https://discord.gg/r-scripts'
-                },
-                thumbnail = {
-                    url = 'https://i.ibb.co/z700S5H/square.png'
-                },
-                fields = {
-                    { name = _L('player_id'),  value = src,        inline = true },
-                    { name = _L('username'),   value = name,       inline = true },
-                    { name = _L('identifier'), value = identifier, inline = false },
-                },
-                timestamp = os.date('!%Y-%m-%dT%H:%M:%S'),
-                footer = {
-                    text = 'r_scripts',
-                    icon_url = 'https://i.ibb.co/z700S5H/square.png',
-                },
-            }
-        }
-    }), { ['Content-Type'] = 'application/json' })
+local resource = GetCurrentResourceName()
+local version = GetResourceMetadata(resource, 'version', 0)
+local bridgeStarted = GetResourceState('r_bridge') == 'started'
+
+DatabaseBuilt = false
+
+local function buildDatabase()
+  local built = MySQL.query.await('SHOW TABLES LIKE "'.. resource .. '"')
+  if #built > 0 then DatabaseBuilt = true return end
+  built = MySQL.query.await('CREATE TABLE `'.. resource .. '` ( `unit` tinyint(4) NOT NULL, PRIMARY KEY (`unit`) )')
+  if not built then print('[^8ERROR^0] - Failed to create database table for '.. resource) end
+  print('[^2SUCCESS^0] - Database table for '.. resource .. ' created.')
+  DatabaseBuilt = true
 end
 
 local function checkResourceVersion()
-    if not Cfg.Server.VersionCheck then return end
-    Core.VersionCheck(GetCurrentResourceName())
-    SetTimeout(3600000, checkResourceVersion)
+  if not Cfg.Server.VersionCheck then return end
+  Core.VersionCheck(resource)
+  SetTimeout(3600000, checkResourceVersion)
 end
 
 function _debug(...)
-    if Cfg.Debug then
-        print(...)
-    end
+  if not Cfg.Debug then return end
+  print('[^6DEBUG^0] -', ...)
 end
 
-AddEventHandler('onResourceStart', function(resource)
-    if (GetCurrentResourceName() == resource) then
-        print('------------------------------')
-        print(_L('version', resource, GetResourceMetadata(resource, 'version', 0)))
-        if GetResourceState('r_bridge') ~= 'started' then
-            print('^1Bridge not detected, please ensure it is running.^0')
-        else
-            print('^2Bridge detected and loaded.^0')
-        end
-        print('------------------------------')
-        checkResourceVersion()
-    end
+AddEventHandler('onResourceStart', function(resourceName)
+  if resourceName ~= resource then return end
+  print('------------------------------')
+  print(_L('resource_version', resource, version))
+  if bridgeStarted then print(_L('bridge_detected'))
+  else print(_L('bridge_not_detected')) end
+  print('------------------------------')
+  checkResourceVersion()
+  -- buildDatabase()
 end)
+
+function SendWebhook(src, event, fields)
+  if not Cfg.Webhook.Enabled then return end
+  local srcName = src > 0 and GetPlayerName(src) or 'Server'
+  local srcId = src > 0 and Core.Framework.GetPlayerIdentifier(src) or 'N/A'
+
+  PerformHttpRequest(Cfg.Webhook.Url, function()
+  end, 'POST', json.encode({
+    username = 'Resource Logs', 
+    avatar_url = 'https://i.ibb.co/N62P014g/logo-2.jpg', 
+    embeds = {
+      {
+        title = event,
+        color = 0x2C1B47, 
+        fields = { 
+          { name = _L('player_id'),   value = src,   inline = true }, 
+          { name = _L('username'),    value = srcName, inline = true }, 
+          { name = _L('identifier'),  value = srcId,   inline = false },
+          table.unpack(fields or {}) 
+        },
+        footer = { text = GetCurrentResourceName() },
+        timestamp = os.date('!%Y-%m-%dT%H:%M:%S') 
+      }
+    }
+  }), { ['Content-Type'] = 'application/json' })
+end

@@ -1,1 +1,0 @@
-r_trapphone            = { name = 'r_trapphone', label = 'Trap Phone', weight = 35, type = 'item', image = 'r_trapphone.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'I do not think this is for calling friends.' },
