@@ -4,21 +4,19 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'resource-name'
+name 'r_drugsales'
 description 'fivem-react-mantine'
 author 'rumaier'
-version '1.0.0'
+version '3.0.0'
 
 shared_scripts {
   '@ox_lib/init.lua',
   'utils/shared.lua',
-  'core/shared/*.lua',
   'locales/*.lua',
   'configs/*.lua'
 }
 
 server_scripts {
-  -- '@oxmysql/lib/MySQL.lua',
   'utils/server.lua',
   'core/server/*.lua',
 }
@@ -38,7 +36,6 @@ files {
 dependencies {
   'ox_lib',
   'r_bridge',
-  -- 'oxmysql'
 }
 
 escrow_ignore {

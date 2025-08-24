@@ -34,3 +34,12 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--mantine-primary-color-7); 
 }
+
+.mantine-TooltipFloating-tooltip {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  background-color: var(--mantine-color-dark-8);
+  color: var(--mantine-color-dark-0);
+  border-radius: var(--mantine-radius-sm);
+  box-shadow: var(--mantine-shadow-sm);
+}
