@@ -35,6 +35,9 @@ Cfg = {
             -- 'sheriff',
         },
 
+        DispatchResource = false, -- Dispatch resource ('linden_outlawalert', 'ps-dispatch', 'cd_dispatch', 'rcore_dispatch', 'custom' or false to disable)
+        -- CUSTOMIZE YOUR DISPATCH SYSTEM IN CORE/CLIENT/DISPATCH.LUA --
+
         DrugItems = {                                              -- List of drug items that can be sold
             ['weed'] = {                                           -- Item Name
                 street = { maxAmount = 5, maxPricePer = 15 },      -- Street sale (max amount player can offer, max price per item)
@@ -62,7 +65,8 @@ Cfg = {
         FetchDistance = 50.0,           -- Distance to fetch nearest ped (only if StreetPedMethod is set to 'fetch', do not set too high)
         PedWalkSpeed = 1.4,             -- Walking speed of the ped when approaching the player (1.0 = walk, 1.5 = run)
         AbandonDistance = 30.0,         -- Distance to abandon the sale (if the player walks away)
-        RobberyChance = 10,             -- Percentage chance that a denied sale will turn into a robbery (0-100)
+        ReportOdds = 100,                -- Percentage chance that a denied sale will be reported to the police (0-100)
+        RobberyChance = 5,              -- Percentage chance that a denied sale will turn into a robbery (0-100)
 
         BulkSales = true,               -- Enable bulk sales (true: enabled, false: disabled)
         BulkMeetupTime = 10,            -- Time in minutes to meet the bulk buyer

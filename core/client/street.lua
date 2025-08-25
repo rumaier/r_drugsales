@@ -133,7 +133,9 @@ local function triggerDeniedSale()
     PlayPedAmbientSpeechNative(entities.customer, 'Generic_Insult_High', 'Speech_Params_Force')
     TaskWanderStandard(entities.customer, 10.0, 10)
     RemovePedElegantly(entities.customer)
-    --// TODO: roll the dispatch and trigger
+    local reportRoll = math.random()
+    _debug('[^6DEBUG^0] - report roll:', reportRoll, 'Report odds:', (Cfg.Options.ReportOdds / 100))
+    if reportRoll <= (Cfg.Options.ReportOdds / 100) then TriggerDispatch() end
     InitializeStreetSale()
 end
 
