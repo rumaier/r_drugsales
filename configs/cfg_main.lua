@@ -25,7 +25,7 @@ Cfg = {
     Options = {
         NuiColor = 'violet',           -- Colors: ('dark', 'gray', 'red', 'pink', 'grape', 'violet', 'indigo', 'blue', 'cyan', 'teal', 'green', 'lime', 'yellow', 'orange')
 
-        Interaction = 'command',       -- Interaction method ('command' or 'item')
+        Interaction = 'item',       -- Interaction method ('command' or 'item')
         InteractCommand = 'dealer',    -- Command to open the dealer menu (if Interaction is set to 'command')
         InteractItem = 'dealer_phone', -- Item to open the dealer menu (if Interaction is set to 'item')
 

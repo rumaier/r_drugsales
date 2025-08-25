@@ -91,7 +91,10 @@ end)
 
 local function registerUsablePhoneItem()
     if Cfg.Options.Interaction ~= 'item' then return end
-    --// TODO: register phone item and provide install material
+    Core.Framework.registerUsableItem(Cfg.Options.InteractItem, function(src)
+        print(('[^5r_drugsales^0] Player %s used dealer phone item'):format(src))
+        TriggerClientEvent('r_drugsales:openMenu', src)
+    end)
 end
 
 local function registerInteractCommand()
