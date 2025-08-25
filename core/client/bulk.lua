@@ -62,6 +62,7 @@ local function triggerBulkExchange()
             cancelSale()
         else
             _debug('[^1ERROR^0] - Sale processing failed, check server console for details')
+            cancelSale()
         end
     end)
 end
