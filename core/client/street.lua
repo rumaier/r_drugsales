@@ -249,11 +249,17 @@ local function setupSaleInteraction()
             end
         }
     })
-    PlayPedAmbientSpeechNative(entities.customer, 'GENERIC_HI', 'SPEECH_PARAMS_FORCE')
+    PlayPedAmbientSpeechNative(entities.customer, 'Generic_Hi', 'Speech_Params_Force')
     while isSelling and not IsNuiFocused() do
         local playerCoords = GetEntityCoords(cache.ped)
         local customerCoords = GetEntityCoords(entities.customer)
         local distance = #(playerCoords - customerCoords)
+        if IsEntityDead(entities.customer) then
+            Core.Target.removeLocalEntity(entities.customer)
+            entities.customer = nil
+            InitializeStreetSale()
+            break
+        end
         if IsPedWalking(entities.customer) or IsPedRunning(entities.customer) then TaskStandStill(entities.customer, 1000) end
         if distance > Cfg.Options.AbandonDistance then
             _debug('[^6DEBUG^0] - Sale abandoned during interaction')
@@ -311,6 +317,8 @@ local function taskNewSale()
         end
         repeat Wait(10) until DoesEntityExist(entities.customer)
         _debug('[^6DEBUG^0] - Sale ready, tasking customer')
+        local speed = Cfg.Options.PedWalkSpeed or 1.5
+        TaskGoToEntity(entities.customer, cache.ped, -1, 1.5, speed, 1073741824, 0)
         while isSelling do
             local playerCoords = GetEntityCoords(cache.ped)
             local customerCoords = GetEntityCoords(entities.customer)
@@ -318,7 +326,6 @@ local function taskNewSale()
             local startDistance = #(startCoords - playerCoords)
             _debug('[^6DEBUG^0] - Customer distance:', customerDistance)
             if (not IsPedWalking(entities.customer) and not IsPedRunning(entities.customer)) and customerDistance > 1.5 then
-                local speed = Cfg.Options.PedWalkSpeed or 1.5
                 TaskGoToEntity(entities.customer, cache.ped, -1, 1.5, speed, 1073741824, 0)
             end
             if startDistance >= Cfg.Options.AbandonDistance then
