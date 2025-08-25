@@ -82,8 +82,19 @@ const DealerMenu: FC<Props> = ({ dismount }) => {
 
   const keypressConfirm = () => {
     playSound('keypress', 0.1);
-    if (option === 0) fetchNui('triggerStreetSell');
-    else if (option === 1) fetchNui('triggerBulkOrder');
+    if (option === 0) fetchNui('triggerStreetSell').then((resp) => {
+      if (resp) {
+        fetchNui('cleanupPhone');
+        fetchNui('setGameFocus');
+        close();
+      };
+    });
+    else if (option === 1) fetchNui('triggerBulkOrder').then((resp) => {
+      if (resp) {
+        fetchNui('setGameFocus');
+        close();
+      };
+    });
   };
 
   useKeybind('Enter', keypressConfirm);

@@ -66,6 +66,7 @@ Cfg = {
 
         BulkSales = true,               -- Enable bulk sales (true: enabled, false: disabled)
         BulkMeetupTime = 10,            -- Time in minutes to meet the bulk buyer
+        BulkCooldown = 15,              -- Cooldown time in minutes between bulk sales
         MeetupCoords = {                -- Determines the coordinates of the meetup locations on bulk sales.
             vec4(201.06, -2000.82, 17.86, 230.26),
             vec4(414.41, -2051.13, 21.22, 141.53),

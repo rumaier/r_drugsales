@@ -1,5 +1,22 @@
 local robberies = {}
 
+lib.callback.register('r_drugsales:processBulkSale', function(src, customerNetId, offer)
+    local customerEntity = NetworkGetEntityFromNetworkId(customerNetId)
+    if not customerEntity or not DoesEntityExist(customerEntity) then return false end
+    local playerEntity = GetPlayerPed(src)
+    local playerCoords = GetEntityCoords(playerEntity)
+    local customerCoords = GetEntityCoords(customerEntity)
+    if #(playerCoords - customerCoords) > 10.0 then return false, _debug('[^1ERROR^0] - Player ' .. src .. ' is too far from customer to complete sale') end
+    local removed = Core.Inventory.removeItem(src, offer.drug, offer.amount)
+    if not removed then return false, _debug('[^1ERROR^0] - Failed to remove drug item from player ' .. src) end
+    if Cfg.Options.CurrencyType == 'account' then
+        Core.Framework.addAccountBalance(src, Cfg.Options.CurrencyName, offer.price)
+    else
+        Core.Inventory.addItem(src, Cfg.Options.CurrencyName, offer.price)
+    end
+    return true
+end)
+
 lib.callback.register('r_drugsales:processRobbery', function(src, customerNetId, offer)
     local removed = Core.Inventory.removeItem(src, offer.drug, offer.amount)
     if not removed then return false, _debug('[^1ERROR^0] - Failed to remove drug item from player ' .. src) end

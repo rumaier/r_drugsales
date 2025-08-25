@@ -26,8 +26,7 @@ client_scripts {
   'core/client/*.lua',
 }
 
--- ui_page 'nui/build/index.html' --// TODO: uncomment and delete below line when for production
-ui_page 'http://localhost:5173/'
+ui_page 'nui/build/index.html'
 files {
   'nui/build/index.html',
   'nui/build/**/*'

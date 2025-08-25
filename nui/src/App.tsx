@@ -7,6 +7,7 @@ import { configStore } from "./stores/config";
 import DealerMenu from "./components/DealerMenu";
 import { useNuiEvent } from "./hooks/useNuiEvent";
 import StreetSale from "./components/StreetSale";
+import BulkSale from "./components/BulkSale";
 
 const App: FC = () => {
   const cfg = configStore((state) => state);
@@ -23,6 +24,7 @@ const App: FC = () => {
   const [mounted, setMounted] = useState<{ [key: string]: boolean }>({
     dealerMenu: false,
     streetSale: false,
+    bulkSale: false,
   });
 
   useNuiEvent('mount', (data: string) => {
@@ -38,6 +40,7 @@ const App: FC = () => {
       <DevWrapper>
         {mounted.dealerMenu && <DealerMenu dismount={() => dismount('dealerMenu')} />}
         {mounted.streetSale && <StreetSale dismount={() => dismount('streetSale')} />}
+        {mounted.bulkSale && <BulkSale dismount={() => dismount('bulkSale')} />}
       </DevWrapper>
     </MantineProvider>
   );

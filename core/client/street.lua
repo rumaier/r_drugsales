@@ -16,16 +16,16 @@ local function taskExchangeAnimation(robbery)
         entities.moneyProp = Core.Natives.createObject('prop_anim_cash_note', vec3(0, 0, 0), 0, true)
         AttachEntityToEntity(entities.moneyProp, entities.customer, customerRightHand, 0.07, 0, -0.01, 18.12, 7.21, -12.44, true, true, false, true, 1, true)
     end
-    Core.Natives.playAnimation(cache.ped, 'mp_common', 'givetake1_a', 1500, 32, 0.0)
-    Core.Natives.playAnimation(entities.customer, 'mp_common', 'givetake1_a', 1500, 32, 0.0)
+    Core.Natives.playAnimation(cache.ped, 'mp_common', 'givetake1_a', 1500, 16, 0.0)
+    Core.Natives.playAnimation(entities.customer, 'mp_common', 'givetake1_a', 1500, 16, 0.0)
     Wait(1500)
     AttachEntityToEntity(entities.drugProp, entities.customer, customerRightHand, 0.07, 0.01, -0.01, 136.33, 50.23, -50.26, true, true, false, true, 1, true)
     if not robbery then
         AttachEntityToEntity(entities.moneyProp, cache.ped, 90, 0.07, 0, -0.01, 18.12, 7.21, -12.44, true, true, false, true, 1, true)
-        Core.Natives.playAnimation(cache.ped, 'weapons@holster_fat_2h', 'holster', 500, 32, 0.0)
+        Core.Natives.playAnimation(cache.ped, 'weapons@holster_fat_2h', 'holster', 500, 16, 0.0)
         DeleteEntity(entities.moneyProp)
     end
-    Core.Natives.playAnimation(entities.customer, 'weapons@holster_fat_2h', 'holster', 500, 32, 0.0)
+    Core.Natives.playAnimation(entities.customer, 'weapons@holster_fat_2h', 'holster', 500, 16, 0.0)
     DeleteEntity(entities.drugProp)
 end
 
@@ -47,7 +47,7 @@ local function retrieveStolenDrugs()
         entities.drugProp = Core.Natives.createObject('prop_meth_bag_01', vec3(0, 0, 0), 0, true)
         AttachEntityToEntity(entities.drugs, entities.customer, GetPedBoneIndex(entities.customer, 28422), 0.07, 0.01, -0.01, 136.33, 50.23, -50.26, true, true, false, true, 1, true)
         Wait(500)
-        Core.Natives.playAnimation(cache.ped, 'weapons@holster_fat_2h', 'holster', 500, 32, 0.0)
+        Core.Natives.playAnimation(cache.ped, 'weapons@holster_fat_2h', 'holster', 500, 16, 0.0)
         DeleteEntity(entities.drugProp)
         local customerNetId = NetworkGetNetworkIdFromEntity(entities.customer)
         local success = lib.callback.await('r_drugsales:retrieveStolenDrugs', false, customerNetId)
@@ -115,7 +115,7 @@ local function triggerAcceptedSale(offer)
     local customerNetId = NetworkGetNetworkIdFromEntity(entities.customer)
     local success = lib.callback.await('r_drugsales:processStreetSale', false, customerNetId, offer)
     if success then
-        Core.Interface.notify(_L('notify_title'), _L('sale_accepted', offer.amount, offer.drug, offer.price), 'success')
+        Core.Interface.notify(_L('notify_title'), _L('sale_finished', offer.amount, offer.drug, offer.price), 'success')
     else
         _debug('[^1ERROR^0] - Sale processing failed, check server console for details')
         cancelSelling()

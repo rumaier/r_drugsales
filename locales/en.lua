@@ -4,6 +4,7 @@ Language['en'] = { -- English
     -- Targets
     offer_drugs = 'Offer Drugs',
     robbery_target = 'Retrieve Stolen Drugs',
+    make_exchange = 'Make Exchange',
 
     -- Notifications
     notify_title = 'Drug Selling',
@@ -16,11 +17,14 @@ Language['en'] = { -- English
     abandoned_sale = 'You abandoned the sale.',
     wait_for_customers = 'Wait for customers to approach you...',
     no_customers_found = 'No customers in the area, go somewhere else.',
-    sale_accepted = 'You sold %sx %s for $%s.',
+    sale_finished = 'You sold %sx %s for $%s.',
     sale_denied = 'Your offer was denied.',
     sale_robbed = 'They robbed you, get them!',
     robber_escaped = 'The robber escaped, you lost the drugs.',
     robber_caught = 'You retrieved your drugs.',
+    on_cooldown = 'You must wait %s minutes before looking for another bulk order.',
+    head_to_meetup = 'Head to the meetup location.',
+    meetup_missed = 'You missed the meetup, the buyer has left.',
 
     -- UI Elements
     sell_here = 'Sell Here',
@@ -31,7 +35,12 @@ Language['en'] = { -- English
     price = 'Price',
     cancel = 'Cancel',
     confirm = 'Confirm',
+    accept = 'Accept',
     offer = 'Offer',
+
+    dialing = 'Dialing',
+    bulk_request = 'Customer is looking for %sx %s for $%s, accept?',
+    meetup_location = 'Meetup Location',
 
     command_help = 'Open the drug dealer menu',
 
