@@ -180,5 +180,5 @@ Cfg = {
     -- | (_| |  __/ |_) | |_| | (_| |
     --  \__,_|\___|_.__/ \__,_|\__, |
     --                         |___/
-    Debug = true -- Enable debug prints (true: enabled, false: disabled)
+    Debug = false -- Enable debug prints (true: enabled, false: disabled)
 }
