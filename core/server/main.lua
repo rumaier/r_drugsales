@@ -91,7 +91,7 @@ end)
 
 local function registerUsablePhoneItem()
     if Cfg.Options.Interaction ~= 'item' then return end
-    
+    --// TODO: register phone item and provide install material
 end
 
 local function registerInteractCommand()
