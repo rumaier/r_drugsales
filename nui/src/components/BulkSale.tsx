@@ -40,13 +40,19 @@ const BulkSale: FC = () => {
   const [offer, setOffer] = useState<Offer | null>(null);
 
   useEffect(() => {
+    if (!visible) {
+      setTimeout(() => {
+        setDialing(true);
+        setOffer(null);
+      }, 200);
+    };
     setTimeout(() => {
       fetchNui<Offer>('getCurrentOffer').then((resp) => {
         setOffer(resp);
         setDialing(false);
       });
     }, 4000);
-  }, []);
+  }, [visible]);
 
   return (
     <>
