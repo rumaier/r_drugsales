@@ -71,6 +71,7 @@ local function spawnCustomer()
     local pedModel = Cfg.Options.BulkPeds[math.random(#Cfg.Options.BulkPeds)]
     entities.customer = Core.Natives.createPed(pedModel, currentSale.coords, currentSale.coords.w, true)
     Core.Natives.setEntityProperties(entities.customer, true, true, true)
+    TaskStartScenarioInPlace(entities.customer, 'WORLD_HUMAN_STAND_IMPATIENT', 0, true)
     Core.Target.addLocalEntity(entities.customer, {
         {
             label = _L('make_exchange'),
