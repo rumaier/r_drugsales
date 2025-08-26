@@ -45,6 +45,7 @@ const StreetSale: FC = () => {
   useEffect(() => {
     if (!visible) return;
     fetchNui<DrugItem[]>('getPlayerDrugs').then((drugs) => {
+      setAmount(1);
       setDrugs(drugs);
     });
   }, [visible]);
