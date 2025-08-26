@@ -61,7 +61,7 @@ local function openMenu()
     triggerPhoneAnimation()
     SetTimeout(750, function()
         _debug('[^6DEBUG^0] - Opening dealer menu')
-        SendNUIMessage({ action = 'mount', data = 'dealerMenu' })
+        SendNUIMessage({ action = 'openDealerMenu' })
         SetNuiFocus(true, true)
     end)
 end

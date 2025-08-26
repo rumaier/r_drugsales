@@ -5,6 +5,7 @@ import { Button, Group, Image, Paper, Text, Transition, useMantineTheme } from "
 import { IconPhoneCall } from "@tabler/icons-react";
 import { locale } from "../stores/locales";
 import { configStore } from "../stores/config";
+import { useNuiEvent } from "../hooks/useNuiEvent";
 
 interface Offer {
   drug: string;
@@ -13,16 +14,13 @@ interface Offer {
   price: number;
 };
 
-interface Props {
-  dismount: () => void;
-};
-
-const BulkSale: FC<Props> = ({ dismount }) => {
+const BulkSale: FC = () => {
   const theme = useMantineTheme();
   const cfg = configStore.getState();
 
   const [visible, { open, close }] = useDisclosure(false);
-  useEffect(() => open(), []);
+
+  useNuiEvent('openBulkSale', () => open());
 
   const [dialing, setDialing] = useState<boolean>(true);
 
@@ -73,7 +71,7 @@ const BulkSale: FC<Props> = ({ dismount }) => {
           </Paper>
         )}
       </Transition>
-      <Transition mounted={visible && !dialing} transition='pop' duration={200} timingFunction='ease' onExited={dismount}>
+      <Transition mounted={visible && !dialing} transition='pop' duration={200} timingFunction='ease'>
         {(transitionStyles) => (
           <Paper
             pos='absolute'

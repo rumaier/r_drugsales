@@ -5,7 +5,6 @@ import { runInitialFetches } from "./utils/initalFetch";
 import DevWrapper from "./components/DevWrapper";
 import { configStore } from "./stores/config";
 import DealerMenu from "./components/DealerMenu";
-import { useNuiEvent } from "./hooks/useNuiEvent";
 import StreetSale from "./components/StreetSale";
 import BulkSale from "./components/BulkSale";
 
@@ -21,26 +20,12 @@ const App: FC = () => {
 
   useEffect(() => runInitialFetches(), []);
 
-  const [mounted, setMounted] = useState<{ [key: string]: boolean }>({
-    dealerMenu: false,
-    streetSale: false,
-    bulkSale: false,
-  });
-
-  useNuiEvent('mount', (data: string) => {
-    setMounted((current) => ({ ...current, [data]: true }));
-  });
-
-  const dismount = (component: string) => {
-    setMounted((current) => ({ ...current, [component]: false }));
-  };
-
   return (
     <MantineProvider theme={theming} forceColorScheme='dark'>
       <DevWrapper>
-        {mounted.dealerMenu && <DealerMenu dismount={() => dismount('dealerMenu')} />}
-        {mounted.streetSale && <StreetSale dismount={() => dismount('streetSale')} />}
-        {mounted.bulkSale && <BulkSale dismount={() => dismount('bulkSale')} />}
+        <DealerMenu />
+        <StreetSale />
+        <BulkSale />
       </DevWrapper>
     </MantineProvider>
   );

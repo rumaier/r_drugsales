@@ -5,7 +5,7 @@ game 'gta5'
 lua54 'yes'
 
 name 'r_drugsales'
-description 'fivem-react-mantine'
+description 'A Simple Drug Selling Script'
 author 'rumaier'
 version '3.0.0'
 
@@ -35,10 +35,4 @@ files {
 dependencies {
   'ox_lib',
   'r_bridge',
-}
-
-escrow_ignore {
-  'install/**/*.*',
-  'locales/*.*',
-  'configs/*.lua',
 }

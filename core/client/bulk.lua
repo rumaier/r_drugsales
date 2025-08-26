@@ -134,7 +134,7 @@ end)
 local function openBulkSaleUi()
     SetTimeout(250, function()
         PlayPedRingtone('Remote_Ring', cache.ped, true)
-        SendNUIMessage({ action = 'mount', data = 'bulkSale' })
+        SendNUIMessage({ action = 'openBulkSale' })
         SetNuiFocus(true, true)
         local data = nil
         while not data do

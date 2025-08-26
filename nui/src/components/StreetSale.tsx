@@ -7,6 +7,7 @@ import { locale } from "../stores/locales";
 import { configStore } from "../stores/config";
 import { useKeybind } from "../hooks/useKeybind";
 import { IconCurrencyDollar } from "@tabler/icons-react";
+import { useNuiEvent } from "../hooks/useNuiEvent";
 
 interface DrugItem {
   name: string;
@@ -17,16 +18,13 @@ interface DrugItem {
   };
 };
 
-interface Props {
-  dismount: () => void;
-};
-
-const StreetSale: FC<Props> = ({ dismount }) => {
+const StreetSale: FC = () => {
   const theme = useMantineTheme();
   const cfg = configStore.getState();
 
   const [visible, { open, close }] = useDisclosure(false);
-  useEffect(() => open(), []);
+
+  useNuiEvent('openStreetSale', () => open());
 
   const [drugs, setDrugs] = useState<DrugItem[]>([]);
 
@@ -45,10 +43,11 @@ const StreetSale: FC<Props> = ({ dismount }) => {
   }, [amount]);
 
   useEffect(() => {
+    if (!visible) return;
     fetchNui<DrugItem[]>('getPlayerDrugs').then((drugs) => {
       setDrugs(drugs);
     });
-  }, []);
+  }, [visible]);
 
   const handleOffer = () => {
     if (!selectedDrug) return;
@@ -66,7 +65,7 @@ const StreetSale: FC<Props> = ({ dismount }) => {
   useKeybind('Escape', handleCancel);
 
   return (
-    <Transition mounted={visible} transition='pop' duration={200} timingFunction='ease' onExited={dismount}>
+    <Transition mounted={visible} transition='pop' duration={200} timingFunction='ease'>
       {(transitionStyles) => (
         <Paper
           pos='absolute'

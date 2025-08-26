@@ -7,12 +7,9 @@ import { locale } from "../stores/locales";
 import { fetchNui } from "../utils/fetchNui";
 import { useKeybind } from "../hooks/useKeybind";
 import { configStore } from "../stores/config";
+import { useNuiEvent } from "../hooks/useNuiEvent";
 
-interface Props {
-  dismount: () => void;
-};
-
-const DealerMenu: FC<Props> = ({ dismount }) => {
+const DealerMenu: FC = () => {
   const theme = useMantineTheme();
   const cfg = configStore.getState();
 
@@ -21,13 +18,15 @@ const DealerMenu: FC<Props> = ({ dismount }) => {
   const playSound = useAudioStore.getState().play;
 
   const [visible, { open, close }] = useDisclosure(false);
-  useEffect(() => open(), []);
+
+  useNuiEvent('openDealerMenu', () => open());
 
   const [time, setTime] = useState<{ hour: number; minute: number }>({ hour: 0, minute: 0 });
 
   useEffect(() => {
+    if (!visible) return;
     fetchNui<{ hour: number; minute: number }>('getGameTime').then((resp) => setTime(resp));
-  }, []);
+  }, [visible]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -100,7 +99,7 @@ const DealerMenu: FC<Props> = ({ dismount }) => {
   useKeybind('Enter', keypressConfirm);
 
   return (
-    <Transition mounted={visible} transition='slide-up' duration={200} timingFunction='ease' onExited={dismount}>
+    <Transition mounted={visible} transition='slide-up' duration={200} timingFunction='ease'>
       {(transitionStyles) => (
         <Paper
           pos='absolute'

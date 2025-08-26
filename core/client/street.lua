@@ -209,7 +209,7 @@ local function openStreetSaleUI()
     _debug('[^6DEBUG^0] - Opening street sale UI')
     Core.Natives.playAnimation(cache.ped, 'anim@amb@casino@hangout@ped_male@stand@03b@idles_convo', 'idle_d', -1, 1, 0.0)
     Core.Natives.playAnimation(entities.customer, 'anim@amb@casino@hangout@ped_male@stand@02b@base', 'base', -1, 1, 0.0)
-    SendNUIMessage({ action = 'mount', data = 'streetSale' })
+    SendNUIMessage({ action = 'openStreetSale' })
     SetNuiFocus(true, true)
     local data = nil
     while not data do
