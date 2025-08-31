@@ -10,11 +10,6 @@ local function checkResourceVersion()
   SetTimeout(3600000, checkResourceVersion)
 end
 
-function _debug(...)
-  if not Cfg.Debug then return end
-  print(...)
-end
-
 AddEventHandler('onResourceStart', function(resourceName)
   if resourceName ~= resource then return end
   print('------------------------------')

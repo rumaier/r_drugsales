@@ -8,6 +8,12 @@ function _L(key, ...)
   return str:format(...)
 end
 
+function _debug(...)
+    if not Cfg.Debug then return end
+    print(...)
+end
+
+
 math.lerp = function(a, b, t)
   return a + (b - a) * t
 end
