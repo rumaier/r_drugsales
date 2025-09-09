@@ -222,6 +222,8 @@ local function openStreetSaleUI()
     end
     saleUiResponse = nil
     SetNuiFocus(false, false)
+    --// TODO: add a timer here to cancel sale if player takes too long
+    -- notification that says you took too long and they left?
     if type(data) == 'table' then
         _debug('[^6DEBUG^0] - Player offered drugs:', json.encode(data))
         triggerOfferDrugs(data)
@@ -330,6 +332,8 @@ local function taskNewSale()
             if (not IsPedWalking(entities.customer) and not IsPedRunning(entities.customer)) and customerDistance > 1.5 then
                 TaskGoToEntity(entities.customer, cache.ped, -1, 1.5, speed, 1073741824, 0)
             end
+            --// TODO: add a timer here to cancel sale if ped takes too long
+            -- notification that says the ped got lost?
             if startDistance >= Cfg.Options.AbandonDistance then
                 _debug('[^6DEBUG^0] - Sale abandoned, customer walked away')
                 Core.Interface.notify(_L('notify_title'), _L('abandoned_sale'), 'error')
