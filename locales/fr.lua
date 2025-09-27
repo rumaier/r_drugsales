@@ -25,6 +25,7 @@ Language['fr'] = { -- French
     on_cooldown = 'Vous devez attendre %s minutes avant de chercher une autre commande en gros.',
     head_to_meetup = 'Rendez-vous au lieu de rencontre.',
     meetup_missed = 'Vous avez manqué le rendez-vous, l\'acheteur est parti.',
+    took_too_long = 'Vous avez pris trop de temps, le client est parti.',
 
     -- UI Elements
     sell_here = 'Vendre ici',

@@ -25,6 +25,7 @@ Language['en'] = { -- English
     on_cooldown = 'You must wait %s minutes before looking for another bulk order.',
     head_to_meetup = 'Head to the meetup location.',
     meetup_missed = 'You missed the meetup, the buyer has left.',
+    took_too_long = 'You took too long, the customer has left.',
 
     -- UI Elements
     sell_here = 'Sell Here',

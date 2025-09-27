@@ -26,6 +26,10 @@ const StreetSale: FC = () => {
 
   useNuiEvent('openStreetSale', () => open());
 
+  useNuiEvent('closeStreetSale', () => {
+    if (visible) handleCancel();
+  });
+
   const [drugs, setDrugs] = useState<DrugItem[]>([]);
 
   const [selectedDrug, setSelectedDrug] = useState<DrugItem | null>(null);

@@ -212,8 +212,15 @@ local function openStreetSaleUI()
     SendNUIMessage({ action = 'openStreetSale' })
     SetNuiFocus(true, true)
     local data = nil
+    local timer = GetGameTimer() + 30000
     while not data do
         Wait(100)
+        if GetGameTimer() > timer then
+            _debug('[^1ERROR^0] - Took too long to make an offer, cancelling sale')
+            Core.Interface.notify(_L('notify_title'), _L('took_too_long'), 'error')
+            SendNUIMessage({ action = 'closeStreetSale' })
+            Wait(100)
+        end
         if IsPedWalking(entities.customer) or IsPedRunning(entities.customer) then TaskStandStill(entities.customer, 1000) end
         if saleUiResponse then
             data = saleUiResponse
@@ -222,8 +229,6 @@ local function openStreetSaleUI()
     end
     saleUiResponse = nil
     SetNuiFocus(false, false)
-    --// TODO: add a timer here to cancel sale if player takes too long
-    -- notification that says you took too long and they left?
     if type(data) == 'table' then
         _debug('[^6DEBUG^0] - Player offered drugs:', json.encode(data))
         triggerOfferDrugs(data)
@@ -323,6 +328,7 @@ local function taskNewSale()
         _debug('[^6DEBUG^0] - Sale ready, tasking customer')
         local speed = Cfg.Options.PedWalkSpeed or 1.5
         TaskGoToEntity(entities.customer, cache.ped, -1, 1.5, speed, 1073741824, 0)
+        local timer = GetGameTimer() + 30000
         while isSelling do
             local playerCoords = GetEntityCoords(cache.ped)
             local customerCoords = GetEntityCoords(entities.customer)
@@ -332,8 +338,11 @@ local function taskNewSale()
             if (not IsPedWalking(entities.customer) and not IsPedRunning(entities.customer)) and customerDistance > 1.5 then
                 TaskGoToEntity(entities.customer, cache.ped, -1, 1.5, speed, 1073741824, 0)
             end
-            --// TODO: add a timer here to cancel sale if ped takes too long
-            -- notification that says the ped got lost?
+            if GetGameTimer() > timer then
+                _debug('[^1ERROR^0] - Customer took too long to arrive, cancelling sale')
+                InitializeStreetSale()
+                break
+            end
             if startDistance >= Cfg.Options.AbandonDistance then
                 _debug('[^6DEBUG^0] - Sale abandoned, customer walked away')
                 Core.Interface.notify(_L('notify_title'), _L('abandoned_sale'), 'error')

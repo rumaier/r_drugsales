@@ -25,6 +25,7 @@ Language['zh'] = { -- Chinese
     on_cooldown = '你必须等待%s分钟才能寻找下一个批量订单。',
     head_to_meetup = '前往会面地点。',
     meetup_missed = '你错过了会面，买家已经离开。',
+    took_too_long = '你花费的时间太长，客户已经离开。',
 
     -- UI Elements
     sell_here = '在此出售',
