@@ -56,7 +56,7 @@ const BulkSale: FC = () => {
 
   return (
     <>
-      <Transition mounted={visible && dialing} transition='pop' duration={200} timingFunction='ease'>
+      <Transition mounted={visible && !offer} transition='pop' duration={200} timingFunction='ease'>
         {(transitionStyles) => (
           <Paper
             pos='absolute'
@@ -77,7 +77,7 @@ const BulkSale: FC = () => {
           </Paper>
         )}
       </Transition>
-      <Transition mounted={visible && !dialing} transition='pop' duration={200} timingFunction='ease'>
+      <Transition mounted={visible && (offer !== null) } transition='pop' duration={200} timingFunction='ease'>
         {(transitionStyles) => (
           <Paper
             pos='absolute'
