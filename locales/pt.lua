@@ -1,49 +1,59 @@
 Language = Language or {}
 Language['pt'] = { -- Portuguese
 
-    -- Target Options
-    sell_drug = 'Vender %s',
-    retrieve_drugs = 'Recuperar drogas',
+    -- Targets
+    offer_drugs = 'Oferecer drogas',
+    robbery_target = 'Recuperar drogas roubadas',
+    make_exchange = 'Fazer troca',
 
     -- Notifications
-    no_narcs = 'A polícia não pode vender drogas!',
-    no_police = 'Não há policiais suficientes online!',
-    no_zone = 'Você não está em uma zona de venda!',
-    no_drugs = 'Você não tem drogas para vender!',
-    no_show = 'Você perdeu o encontro! O negócio está cancelado!',
-    no_vehicle = 'Você não pode fazer isso de dentro de um veículo!',
-    out_of_drug = 'Você está sem %s!',
-    not_enough_drugs = 'Você não tem drogas suficientes!',
-    too_far = 'Você saiu da sua área de venda!',
-    already_selling = 'Você já está vendendo drogas!',
-    wait_for_customer = 'Espere um cliente te encontrar.',
-    go_meet_customer = 'Vá encontrar o cliente no local de encontro.',
-    customer_dead = 'Você não pode vender para um cliente morto!',
-    sold_drugs = 'Você vendeu %sx %s por $%s.',
-    rejected_sale = 'Eu não quero essa porcaria!',
-    robbed = 'Dinheiro falso?! Persiga esse ladrão!',
-    got_away = 'Eles fugiram! R.I.P. para essas drogas.',
-    retrieved_drugs = 'Você recuperou %sx %s.',
+    notify_title = 'Venda de drogas',
+    police_cant_sell = 'Policiais não podem vender drogas.',
+    not_enough_police = 'Não há policiais suficientes online para vender drogas.',
+    cant_in_vehicle = 'Você não pode vender drogas dentro de um veículo.',
+    not_in_zone = 'Você não pode vender drogas aqui.',
+    not_enough_drugs = 'Você não tem drogas suficientes para vender.',
+    already_selling = 'Você já está vendendo drogas.',
+    abandoned_sale = 'Você abandonou a venda.',
+    wait_for_customers = 'Espere os clientes se aproximarem...',
+    no_customers_found = 'Não há clientes na área, vá para outro lugar.',
+    sale_finished = 'Você vendeu %sx %s por $%s.',
+    sale_denied = 'Sua oferta foi recusada.',
+    sale_robbed = 'Você foi roubado, pegue-os!',
+    robber_escaped = 'O ladrão escapou, você perdeu as drogas.',
+    robber_caught = 'Você recuperou suas drogas.',
+    on_cooldown = 'Você deve esperar %s minutos antes de procurar outro pedido em massa.',
+    head_to_meetup = 'Vá ao local do encontro.',
+    meetup_missed = 'Você perdeu o encontro, o comprador foi embora.',
+    took_too_long = 'Você demorou muito, o cliente foi embora.',
 
-    -- Blip Labels
-    meetup_location = 'Local de Encontro',
+    -- UI Elements
+    sell_here = 'Vender aqui',
+    bulk_order = 'Encontrar pedido em massa',
+    select_drug = 'Selecionar droga',
+    selected = 'Selecionado',
+    amount = 'Quantidade',
+    price = 'Preço',
+    cancel = 'Cancelar',
+    confirm = 'Confirmar',
+    accept = 'Aceitar',
+    offer = 'Oferta',
 
-    -- Menu Titles
-    dealer_menu = 'Menu do Dealer',
+    dialing = 'Discando',
+    bulk_request = 'O cliente procura %sx %s por $%s, aceitar?',
+    meetup_location = 'Local do encontro',
 
-    -- Menu Options
-    street_sales = 'Vendas de Rua',
-    bulk_sales = 'Vendas em Lote',
+    command_help = 'Abrir o menu do dealer',
 
-    -- Menu Subtitles
-    street_sales_desc = 'Venda drogas para pessoas aleatórias nas ruas.',
-    bulk_sales_desc = 'Venda drogas para um comprador em lote em um encontro.',
+    -- Webhook
+    player_id = 'ID do Jogador',
+    username = 'Nome de usuário',
+    identifier = 'Identificador',
 
-    -- Server Console
-    version = '%s | v%s',
-    framework = 'Framework: %s',
-    inventory = 'Inventário: %s',
-    target = 'Alvo: %s',
-    cheater = 'Expulso por trapaça.',
-    update = 'Por favor, atualize %s para a versão mais recente do Github',
+    -- Console
+    resource_version = '%s | v%s',
+    bridge_detected = '^2Bridge detectado e carregado.^0',
+    bridge_not_detected = '^1Bridge não detectado, certifique-se de que está funcionando.^0',
+    cheater_print = 'Você tentou enganar o sistema. O sistema foi mais esperto.',
+    debug_enabled = '^1Modo debug ATIVADO! Não use em produção!^0',
 }

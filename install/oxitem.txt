@@ -1,0 +1,6 @@
+['dealer_phone'] = {
+	label = 'Dealer Phone',
+	weight = 136,
+	stack = false,
+	close = true,
+},

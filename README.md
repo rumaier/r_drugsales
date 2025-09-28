@@ -1,4 +1,4 @@
-# r_drugsales
+# r_drugsales v3
 
 ## Description
 
@@ -8,7 +8,6 @@ This is a script designed to be a versatile way for players in your server to se
 
 - 🚀 Performance-oriented and design.
 - 🔒 Reliable and secure functionality.
-- ⚙️ Utilizes ox_lib for seamless integration.
 - 📝 Command or Usable Item interaction.
 - 📦 Allows support for as many drugs as you need.
 - 💲 Different sale methods, with configurable pay.
