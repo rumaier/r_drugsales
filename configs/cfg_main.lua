@@ -65,6 +65,7 @@ Cfg = {
         FetchDistance = 50.0,           -- Distance to fetch nearest ped (only if StreetPedMethod is set to 'fetch', do not set too high)
         PedWalkSpeed = 1.4,             -- Walking speed of the ped when approaching the player (1.0 = walk, 1.5 = run)
         AbandonDistance = 30.0,         -- Distance to abandon the sale (if the player walks away)
+        ForcedCleanup = false,          -- This will force cleanup the last sale ped after 30 seconds regardless of location (true: enabled, false: disabled)
         ReportOdds = 100,                -- Percentage chance that a denied sale will be reported to the police (0-100)
         RobberyChance = 5,              -- Percentage chance that a denied sale will turn into a robbery (0-100)
 

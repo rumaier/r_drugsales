@@ -7,7 +7,7 @@ lua54 'yes'
 name 'r_drugsales'
 description 'A Simple Drug Selling Script'
 author 'rumaier'
-version '3.0.0'
+version '3.1.0'
 
 shared_scripts {
   '@ox_lib/init.lua',

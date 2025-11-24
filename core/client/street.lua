@@ -2,6 +2,13 @@ local zones = {}
 local isSelling = false
 local inZone = not Cfg.Options.ZonesEnabled
 local entities = {}
+local forcedCleanup = Cfg.Options.ForcedCleanup
+
+local function setEntityForCleanup(entity)
+    SetTimeout(30000, function()
+        DeleteEntity(entity)
+    end)
+end
 
 function IsStreetSelling()
     return isSelling
@@ -34,6 +41,7 @@ local function cancelSelling()
     if not entities.customer or not DoesEntityExist(entities.customer) then return end
     TaskWanderStandard(entities.customer, 10.0, 10)
     RemovePedElegantly(entities.customer)
+    if forcedCleanup then setEntityForCleanup(entities.customer) end
     Core.Target.removeLocalEntity(entities.customer)
     entities.customer = nil
 end
@@ -54,6 +62,7 @@ local function retrieveStolenDrugs()
         if success then
             Core.Interface.notify(_L('notify_title'), _L('robber_caught'), 'success')
             RemovePedElegantly(entities.customer)
+            if forcedCleanup then setEntityForCleanup(entities.customer) end
             entities.customer = nil
             InitializeStreetSale()
         else
@@ -80,6 +89,7 @@ local function taskCustomerFlee()
     if distance > 50 then
         Core.Interface.notify(_L('notify_title'), _L('robber_escaped'), 'error')
         RemovePedElegantly(entities.customer)
+        if forcedCleanup then setEntityForCleanup(entities.customer) end
         entities.customer = nil
     elseif robberDead then
         Core.Target.addLocalEntity(entities.customer, {
@@ -123,6 +133,7 @@ local function triggerAcceptedSale(offer)
     PlayPedAmbientSpeechNative(entities.customer, 'Generic_Thanks', 'Speech_Params_Force')
     TaskWanderStandard(entities.customer, 10.0, 10)
     RemovePedElegantly(entities.customer)
+    if forcedCleanup then setEntityForCleanup(entities.customer) end
     entities.customer = nil
     InitializeStreetSale()
 end
@@ -133,6 +144,7 @@ local function triggerDeniedSale()
     PlayPedAmbientSpeechNative(entities.customer, 'Generic_Insult_High', 'Speech_Params_Force')
     TaskWanderStandard(entities.customer, 10.0, 10)
     RemovePedElegantly(entities.customer)
+    if forcedCleanup then setEntityForCleanup(entities.customer) end
     local reportRoll = math.random()
     _debug('[^6DEBUG^0] - report roll:', reportRoll, 'Report odds:', (Cfg.Options.ReportOdds / 100))
     if reportRoll <= (Cfg.Options.ReportOdds / 100) then TriggerDispatch() end
@@ -237,6 +249,7 @@ local function openStreetSaleUI()
         PlayPedAmbientSpeechNative(entities.customer, 'Generic_Insult_High', 'Speech_Params_Force')
         TaskWanderStandard(entities.customer, 10.0, 10)
         RemovePedElegantly(entities.customer)
+        if forcedCleanup then setEntityForCleanup(entities.customer) end
         InitializeStreetSale()
     end
 end
