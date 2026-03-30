@@ -1,10 +1,12 @@
 Language = Language or {}
 Language['en'] = { -- English
 
+    -- Targets
     offer_drugs = 'Offer Drugs',
     robbery_target = 'Retrieve Stolen Drugs',
     make_exchange = 'Make Exchange',
 
+    -- Notifications
     notify_title = 'Drug Selling',
     police_cant_sell = 'Police officers cannot sell drugs.',
     not_enough_police = 'Not enough police online to sell drugs.',
@@ -25,6 +27,7 @@ Language['en'] = { -- English
     meetup_missed = 'You missed the meetup, the buyer has left.',
     took_too_long = 'You took too long, the customer has left.',
 
+    -- UI Elements
     sell_here = 'Sell Here',
     bulk_order = 'Find Bulk Order',
     select_drug = 'Select Drug',
@@ -41,11 +44,16 @@ Language['en'] = { -- English
     meetup_location = 'Meetup Location',
 
     command_help = 'Open the drug dealer menu',
-    
-    server_id = 'Server ID',
+
+    -- Webhook
+    player_id = 'Player ID',
     username = 'Username',
     identifier = 'Identifier',
-    
-    startup_info = '%s | v%s',
-    debug_enabled = '^3DEBUG MODE IS ENABLED^0',
+
+    -- Console
+    resource_version = '%s | v%s',
+    bridge_detected = '^2Bridge detected and loaded.^0',
+    bridge_not_detected = '^1Bridge not detected, please ensure it is running.^0',
+    cheater_print = 'You tried to outsmart the system. The system outsmarted you.',
+    debug_enabled = '^1Debug mode is ON! Do NOT run this in production!^0',
 }

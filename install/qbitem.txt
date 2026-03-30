@@ -1,0 +1,1 @@
+dealer_phone = { name = 'dealer_phone', label = 'Dealer Phone', weight = 136, type = 'item', image = 'dealer_phone.png', unique = true, useable = true, shouldClose = true, description = '' },

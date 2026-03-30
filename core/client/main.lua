@@ -1,57 +1,69 @@
-local phoneModel = `prop_prologue_phone`
-local phoneProp = nil
+local phone = { model = 'prop_prologue_phone', entity = nil }
 
-RegisterNUICallback('triggerStreet', function(_, cb)
-    if IsStreetSelling() or IsBulkSelling() then
-        Core.Interface.notify(locale('notify_title'), locale('already_selling'), 'error')
-        return cb(false)
+RegisterNUICallback('triggerStreetSell', function(_, cb)
+    if IsStreetSelling() then
+        Core.Interface.notify(_L('notify_title'), _L('already_selling'), 'error')
+        cb(false)
+        return
     end
-    cb(StreetSale())
+    local started = InitializeStreetSale()
+    cb(started)
 end)
 
-RegisterNUICallback('triggerBulk', function(_, cb)
-    if IsStreetSelling() or IsBulkSelling() then
-        Core.Interface.notify(locale('notify_title'), locale('already_selling'), 'error')
-        return cb(false)
+RegisterNUICallback('triggerBulkOrder', function(_, cb)
+    if IsBulkSelling() then
+        Core.Interface.notify(_L('notify_title'), _L('already_selling'), 'error')
+        cb(false)
+        return
     end
-    if IsBulkCooldown() then
-        local duration = Cfg.BulkCooldown
-        Core.Interface.notify(locale('notify_title'), locale('on_cooldown', duration), 'error')
-        return cb(false)
+    if IsBulkOnCooldown() then
+        Core.Interface.notify(_L('notify_title'), _L('on_cooldown', Cfg.Options.BulkCooldown), 'error')
+        cb(false)
+        return
     end
-    cb(BulkSale())
+    local started = InitializeBulkSale()
+    cb(started)
 end)
 
-RegisterNUICallback('getTime', function(_, cb)
-    cb({
-        hour = GetClockHours(),
-        minute = GetClockMinutes()
-    })
+RegisterNUICallback('getGameTime', function(_, cb)
+    local hour = GetClockHours()
+    local minute = GetClockMinutes()
+    cb({ hour = hour, minute = minute })
 end)
 
-function DeletePhone()
-    if not phoneProp then return end
-    DeleteEntity(phoneProp)
-    phoneProp = nil
+function CleanupPhone()
+    if not phone.entity then return end
+    DeleteEntity(phone.entity)
+    phone.entity = nil
 end
 
-RegisterNUICallback('closeMenu', function(_, cb)
-    Core.Natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_out', 750, 16, 0.0)
-    Wait(750)
-    DeletePhone()
+RegisterNUICallback('cleanupPhone', function(_, cb)
     cb(true)
+    Core.Natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_out', 750, 16, 0.0)
+    SetTimeout(750, CleanupPhone)
 end)
 
-local function triggerPhoneAnim()
-    phoneProp = Core.Natives.createObject(phoneModel, vec3(0, 0, 0), 0, true)
-    AttachEntityToEntity(phoneProp, cache.ped, 90, 0, 0, 0, 0, 0, 0, false, false, false, false, 2, true)
+local function triggerPhoneAnimation()
+    phone.entity = Core.Natives.createObject(phone.model, vec3(0, 0, 0), 0, true)
+    repeat Wait(0) until DoesEntityExist(phone.entity)
+    AttachEntityToEntity(phone.entity, cache.ped, 90, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
     Core.Natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_in', 750, 16, 0.0)
-    Wait(750)
-    Core.Natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_read_base', -1, 17, 0.0)
+    SetTimeout(750, function()
+        Core.Natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_read_base', -1, 17, 0.0)
+    end)
 end
 
-RegisterNetEvent('r_drugsales:openMenu', function()
-    SendNUIMessage({ action = 'openMenu' })
-    SetNuiFocus(true, true)
-    triggerPhoneAnim()
-end)
+local function openMenu()
+    local isPolice = lib.callback.await('r_drugsales:isPlayerPolice', false)
+    local policeCount = lib.callback.await('r_drugsales:getPoliceCount', false)
+    if isPolice then Core.Interface.notify(_L('notify_title'), _L('police_cant_sell'), 'error') return end
+    if policeCount < Cfg.Options.MinimumPolice then Core.Interface.notify(_L('notify_title'), _L('not_enough_police'), 'error') return end
+    triggerPhoneAnimation()
+    SetTimeout(750, function()
+        _debug('[^6DEBUG^0] - Opening dealer menu')
+        SendNUIMessage({ action = 'openDealerMenu' })
+        SetNuiFocus(true, true)
+    end)
+end
+
+RegisterNetEvent('r_drugsales:openMenu', openMenu)
