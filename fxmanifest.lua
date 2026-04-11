@@ -1,38 +1,43 @@
 ---@diagnostic disable: undefined-global
-
 fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'r_drugsales'
-description 'A Simple Drug Selling Script'
-author 'rumaier'
-version '3.1.0'
+name 'resource_name'
+description 'resource_description'
+author 'author_name'
+version '1.0.0'
 
 shared_scripts {
-  '@ox_lib/init.lua',
-  'utils/shared.lua',
-  'locales/*.lua',
-  'configs/*.lua'
+    '@ox_lib/init.lua',
+    'core/shared/*.lua',
+    'locales/*.lua',
+    'config.lua',
 }
 
 server_scripts {
-  'utils/server.lua',
-  'core/server/*.lua',
+    '@oxmysql/lib/MySQL.lua', -- Uncomment if resource uses oxmysql
+    'core/server/*.lua',
 }
 
 client_scripts {
-  'utils/client.lua',
-  'core/client/*.lua',
+    'core/client/*.lua',
 }
 
-ui_page 'nui/build/index.html'
+-- ui_page 'web/dist/index.html' -- uncomment if resource has nui built
+-- ui_page 'http://localhost:5173/' -- uncomment for vite dev server, remove in production
 files {
-  'nui/build/index.html',
-  'nui/build/**/*'
+    'web/dist/index.html',
+    'web/dist/**/*',
 }
 
 dependencies {
-  'ox_lib',
-  'r_bridge',
+    'r_bridge'
+}
+
+escrow_ignore {
+    'core/server/logging.lua',
+    'install/**/*.*',
+    'locales/*.*',
+    'config.lua'    
 }
