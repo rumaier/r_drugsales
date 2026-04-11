@@ -3,10 +3,10 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'resource_name'
-description 'resource_description'
-author 'author_name'
-version '1.0.0'
+name 'r_drugsales'
+description 'A Simple Drug Selling Script'
+author 'rumaier'
+version '4.0.0'
 
 shared_scripts {
     '@ox_lib/init.lua',
@@ -16,7 +16,6 @@ shared_scripts {
 }
 
 server_scripts {
-    '@oxmysql/lib/MySQL.lua', -- Uncomment if resource uses oxmysql
     'core/server/*.lua',
 }
 
@@ -25,7 +24,7 @@ client_scripts {
 }
 
 -- ui_page 'web/dist/index.html' -- uncomment if resource has nui built
--- ui_page 'http://localhost:5173/' -- uncomment for vite dev server, remove in production
+ui_page 'http://localhost:5173/'
 files {
     'web/dist/index.html',
     'web/dist/**/*',
