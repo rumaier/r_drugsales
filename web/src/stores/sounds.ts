@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import KeypressSound from "../assets/sounds/keypress.ogg"
 
 interface SoundStore {
   play: (sound: string, volume?: number) => void;
@@ -15,7 +16,9 @@ interface Sound {
 
 export const useSoundStore = create<SoundStore>(() => {
   const refs: SoundRef = {};
-  const sounds: Sound = {};
+  const sounds: Sound = {
+    'keypress': KeypressSound,
+  };
   Object.keys(sounds).forEach((sound) => {
     refs[sound] = new Audio(sounds[sound]);
   });

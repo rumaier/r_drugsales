@@ -4,12 +4,13 @@ game 'gta5'
 lua54 'yes'
 
 name 'r_drugsales'
-description 'A Simple Drug Selling Script'
+description 'A Simple Drug Selling Script for FiveM'
 author 'rumaier'
-version '4.0.0'
+version '3.2.0'
 
 shared_scripts {
     '@ox_lib/init.lua',
+    '@r_bridge/init.lua',
     'core/shared/*.lua',
     'locales/*.lua',
     'config.lua',
@@ -35,7 +36,6 @@ dependencies {
 }
 
 escrow_ignore {
-    'core/server/logging.lua',
     'install/**/*.*',
     'locales/*.*',
     'config.lua'    

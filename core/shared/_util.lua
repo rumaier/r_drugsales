@@ -16,9 +16,3 @@ function _debug(...)
     if not Cfg.Debug then return end
     print('[^6DEBUG^0] ' .. ...)
 end
-
-function _error(...)
-    if not Cfg.Debug then return false end
-    print('[^1ERROR^0] ' .. ...)
-    return false
-end

@@ -12,25 +12,3 @@ body {
 *:focus {
   outline: none;
 }
-
-::-webkit-scrollbar {
-  width: 0.4rem;
-  height: 100%;
-}
-
-::-webkit-scrollbar-track {
-  border-radius: var(--mantine-radius-sm);
-  background: var(--mantine-color-dark-7);
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-}
-
-::-webkit-scrollbar-thumb {
-  border-radius: var(--mantine-radius-sm);
-  background: var(--mantine-color-dark-6);
-  cursor: pointer;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--mantine-color-dark-5);
-}

@@ -1,13 +1,15 @@
 import { MantineProvider, mergeMantineTheme, type MantineTheme } from "@mantine/core";
-import { ModalsProvider } from '@mantine/modals';
 import { useEffect, useState, type FC } from "react";
 import { useConfigStore } from "./stores/config";
 import { theme } from "./theme";
 import { runInitialFetches } from "./utils/initFetch";
+import DealerMenu from "./components/DealerMenu/DealerMenu";
+import OfferInterface from "./components/OfferInterface/OfferInterface";
+import OrderInterface from "./components/OrderInterface/OrderInterface";
 
 const App: FC = () => {
-  const nuiColor = useConfigStore((state) => state.NuiColor);
 
+  const nuiColor = useConfigStore((state) => state.NuiColor);
   const [mantineTheme, setMantineTheme] = useState<MantineTheme>(theme);
 
   useEffect(() => {
@@ -24,9 +26,9 @@ const App: FC = () => {
 
   return (
     <MantineProvider theme={mantineTheme} forceColorScheme='dark'>
-      <ModalsProvider>
-        {/* App goes here */}
-      </ModalsProvider>
+        <DealerMenu />
+        <OfferInterface />
+        <OrderInterface />
     </MantineProvider>
   );
 };
