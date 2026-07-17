@@ -24,8 +24,7 @@ client_scripts {
     'core/client/*.lua',
 }
 
--- ui_page 'web/dist/index.html' -- uncomment if resource has nui built
-ui_page 'http://localhost:5173/'
+ui_page 'web/dist/index.html'
 files {
     'web/dist/index.html',
     'web/dist/**/*',

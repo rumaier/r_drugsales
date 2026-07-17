@@ -1,5 +1,5 @@
 import { hasLength, useForm } from "@mantine/form";
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import { useNuiEvent } from "../../hooks/useNuiEvent";
 import { useConfigStore } from "../../stores/config";
 import { locale } from "../../stores/locales";
