@@ -24,7 +24,7 @@ local function loadClientConfig()
         Wait(attempt * 250)
     end
     if not config then
-        print('^1[r_drugsales]^0 Failed to load client config; retrying in the background')
+        log('warn', 'Failed to load client config; retrying in the background')
         CreateThread(function()
             while true do
                 Wait(1000)
