@@ -19,18 +19,18 @@ local function refreshCanSell()
     else
         canSell = not inside
     end
-    _debug('canSell: ' .. tostring(canSell))
+    log('debug','canSell: ' .. tostring(canSell))
 end
 
 RegisterNUICallback('offerInterfaceResponse', function(data, cb)
-    _debug('response: ' .. json.encode(data))
+    log('debug','response: ' .. json.encode(data))
     offerInterfaceResponse = data
     cb(true)
 end)
 
 local function setEntityForCleanup(entity)
     if not entity or not Cfg.ForceCleanup then return end
-    _debug('Cleaning up entity ' .. tostring(entity) .. ' in 30 seconds')
+    log('debug','Cleaning up entity ' .. tostring(entity) .. ' in 30 seconds')
     SetTimeout(30000, function()
         DeleteEntity(entity)
         for k, v in pairs(entities) do
@@ -269,7 +269,7 @@ local function taskCustomerAwaitOffer()
             break
         end
         if IsEntityDead(entities.customer) then
-            _debug('customer is dead, cancelling sale...')
+            log('debug','customer is dead, cancelling sale...')
             return cancelSale()
         end
         if IsPedWalking(entities.customer) or IsPedRunning(entities.customer) then
@@ -290,7 +290,7 @@ local function taskCustomerApproachPlayer(homePos)
         local pCoords = GetEntityCoords(cache.ped)
         local cCoords = GetEntityCoords(entities.customer)
         if GetGameTimer() > timeLimit then
-            _debug('customer timed out')
+            log('debug','customer timed out')
             return restartStreetSale()
         end
         if (not IsPedWalking(entities.customer) and not IsPedRunning(entities.customer)) and #(pCoords - cCoords) > 1.5 then
@@ -321,7 +321,7 @@ local function startStreetSale()
                 bridge.interface.notify(locale('drug_sales'), locale('no_customers_found'), 'error')
                 return cancelSale()
             end
-            _debug('found customer: ' .. tostring(entities.customer))
+            log('debug','found customer: ' .. tostring(entities.customer))
         elseif pedMethod == 'spawn' then
             local models = Cfg.StreetPedModels
             local coords = GetOffsetFromEntityInWorldCoords(cache.ped, 0.0, 25.0, 0.0)
@@ -332,7 +332,7 @@ local function startStreetSale()
                 bridge.interface.notify(locale('drug_sales'), locale('no_customers_found'), 'error')
                 return cancelSale()
             end
-            _debug('spawned customer: ' .. tostring(entities.customer))
+            log('debug','spawned customer: ' .. tostring(entities.customer))
         end
         taskCustomerApproachPlayer(homePos)
     end)
@@ -401,7 +401,7 @@ local function initZones()
         }))
     end
     refreshCanSell()
-    _debug('Initialized ' .. #zones .. ' zones')
+    log('debug','Initialized ' .. #zones .. ' zones')
 end
 
 local function tryInitZones()

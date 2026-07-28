@@ -4,14 +4,14 @@ local entities = {}
 local orderInterfaceResponse = nil
 
 RegisterNUICallback('orderInterfaceResponse', function(data, cb)
-    _debug('response: ' .. tostring(data))
+    log('debug','response: ' .. tostring(data))
     orderInterfaceResponse = data
     cb(true)
 end)
 
 local function setEntityForCleanup(entity)
     if not entity or not Cfg.ForceCleanup then return end
-    _debug('Cleaning up entity ' .. tostring(entity) .. ' in 30 seconds')
+    log('debug','Cleaning up entity ' .. tostring(entity) .. ' in 30 seconds')
     SetTimeout(30000, function()
         DeleteEntity(entity)
         for k, v in pairs(entities) do
@@ -96,7 +96,7 @@ local function spawnCustomer(point)
             end
         }
     })
-    _debug('Customer spawned at ' .. point.coords)
+    log('debug','Customer spawned at ' .. point.coords)
 end
 
 local function startBulkSale(meetup)

@@ -15,10 +15,6 @@ local BULK_SALE_COOLDOWN_MS = 500
 local RETRIEVAL_COOLDOWN_MS = 500
 local GET_DRUGS_COOLDOWN_MS = 500
 
-local function warn(src, message)
-    print(('^1[r_drugsales]^0 Player %s %s'):format(src, message))
-end
-
 local function getCooldownKey(src, action)
     return ('%s:%s'):format(src, action)
 end
@@ -209,12 +205,12 @@ end)
 
 lib.callback.register('r_drugsales:getPlayerDrugs', function(src)
     if isOnCooldown(src, 'getDrugs', GET_DRUGS_COOLDOWN_MS) then
-        warn(src, 'rate limited getPlayerDrugs')
+        log('warn', ('Player %s %s'):format(src, 'rate limited getPlayerDrugs'))
         return {}
     end
     setCooldown(src, 'getDrugs')
     if not requireSaleAccess(src) then
-        warn(src, 'blocked getPlayerDrugs without sale access')
+        log('warn', ('Player %s %s'):format(src, 'blocked getPlayerDrugs without sale access'))
         return {}
     end
     return getPlayerDrugs(src)
@@ -222,33 +218,33 @@ end)
 
 lib.callback.register('r_drugsales:registerStreetCustomer', function(src, netId)
     if isOnCooldown(src, 'registerCustomer', STREET_OFFER_COOLDOWN_MS) then
-        warn(src, 'rate limited registerStreetCustomer')
+        log('warn', ('Player %s %s'):format(src, 'rate limited registerStreetCustomer'))
         return false
     end
     if not requireSaleAccess(src) then
-        warn(src, 'blocked registerStreetCustomer without sale access')
+        log('warn', ('Player %s %s'):format(src, 'blocked registerStreetCustomer without sale access'))
         return false
     end
     if not isPlayerInSellZone(src) then
-        warn(src, 'blocked registerStreetCustomer outside sell zone')
+        log('warn', ('Player %s %s'):format(src, 'blocked registerStreetCustomer outside sell zone'))
         return false
     end
     if type(netId) ~= 'number' then
-        warn(src, 'invalid netId for registerStreetCustomer')
+        log('warn', ('Player %s %s'):format(src, 'invalid netId for registerStreetCustomer'))
         return false
     end
     if customerPedOwners[netId] and customerPedOwners[netId] ~= src then
-        warn(src, 'attempted to register customer already owned by another player')
+        log('warn', ('Player %s %s'):format(src, 'attempted to register customer already owned by another player'))
         return false
     end
     local customer = NetworkGetEntityFromNetworkId(netId)
     if not customer or not DoesEntityExist(customer) then
-        warn(src, 'attempted to register non-existent customer ped')
+        log('warn', ('Player %s %s'):format(src, 'attempted to register non-existent customer ped'))
         return false
     end
     local maxDistance = (Cfg.StreetFetchDistance or 25.0) + CUSTOMER_REGISTER_BUFFER
     if not isNearEntity(src, customer, maxDistance) then
-        warn(src, 'attempted to register customer ped too far away')
+        log('warn', ('Player %s %s'):format(src, 'attempted to register customer ped too far away'))
         return false
     end
     if streetSessions[src] then
@@ -263,30 +259,30 @@ end)
 
 lib.callback.register('r_drugsales:resolveStreetOffer', function(src, netId, offer)
     if isOnCooldown(src, 'streetOffer', STREET_OFFER_COOLDOWN_MS) then
-        warn(src, 'rate limited resolveStreetOffer')
+        log('warn', ('Player %s %s'):format(src, 'rate limited resolveStreetOffer'))
         return false
     end
     if not requireSaleAccess(src) then
-        warn(src, 'blocked resolveStreetOffer without sale access')
+        log('warn', ('Player %s %s'):format(src, 'blocked resolveStreetOffer without sale access'))
         return false
     end
     if not isPlayerInSellZone(src) then
-        warn(src, 'blocked resolveStreetOffer outside sell zone')
+        log('warn', ('Player %s %s'):format(src, 'blocked resolveStreetOffer outside sell zone'))
         return false
     end
     local session = streetSessions[src]
     if not session or session.netId ~= netId then
-        warn(src, 'resolveStreetOffer without matching street session')
+        log('warn', ('Player %s %s'):format(src, 'resolveStreetOffer without matching street session'))
         return false
     end
     local validatedOffer = validateStreetOffer(src, offer)
     if not validatedOffer then
-        warn(src, 'invalid street offer payload')
+        log('warn', ('Player %s %s'):format(src, 'invalid street offer payload'))
         return false
     end
     local customer = NetworkGetEntityFromNetworkId(netId)
     if not isNearEntity(src, customer, SALE_PROXIMITY) then
-        warn(src, 'resolveStreetOffer customer too far away')
+        log('warn', ('Player %s %s'):format(src, 'resolveStreetOffer customer too far away'))
         return false
     end
     setCooldown(src, 'streetOffer')
@@ -295,7 +291,7 @@ lib.callback.register('r_drugsales:resolveStreetOffer', function(src, netId, off
     local roll = math.random()
     if roll <= acceptOdds then
         if not bridge.inventory.removeItem(src, validatedOffer.item, validatedOffer.count) then
-            warn(src, 'failed to remove items for accepted street sale')
+            log('warn', ('Player %s %s'):format(src, 'failed to remove items for accepted street sale'))
             return false
         end
         local payout = validatedOffer.price * validatedOffer.count
@@ -309,12 +305,12 @@ lib.callback.register('r_drugsales:resolveStreetOffer', function(src, netId, off
 
     if math.random() <= (Cfg.StreetRobberyChance / 100) then
         if not bridge.inventory.removeItem(src, validatedOffer.item, validatedOffer.count) then
-            warn(src, 'failed to remove items for street robbery')
+            log('warn', ('Player %s %s'):format(src, 'failed to remove items for street robbery'))
             return false
         end
         local identifier = bridge.framework.getPlayerIdentifier(src)
         if not identifier then
-            warn(src, 'failed to get identifier for street robbery')
+            log('warn', ('Player %s %s'):format(src, 'failed to get identifier for street robbery'))
             return false
         end
         robberies[identifier] = {
@@ -335,14 +331,14 @@ end)
 
 lib.callback.register('r_drugsales:bulkOrderRequest', function(src)
     if isOnCooldown(src, 'bulkRequest', BULK_REQUEST_COOLDOWN_MS) then
-        warn(src, 'rate limited bulkOrderRequest')
+        log('warn', ('Player %s %s'):format(src, 'rate limited bulkOrderRequest'))
         return {}, false
     end
     if not Cfg.BulkSalesEnabled then
         return {}, false, 'bulk_sales_disabled'
     end
     if not requireSaleAccess(src) then
-        warn(src, 'blocked bulkOrderRequest without sale access')
+        log('warn', ('Player %s %s'):format(src, 'blocked bulkOrderRequest without sale access'))
         return {}, false
     end
     if isBulkOnCooldown(src) then
@@ -368,15 +364,15 @@ end)
 lib.callback.register('r_drugsales:bulkOrderAccept', function(src)
     local order = bulkOrders[src]
     if not order then
-        warn(src, 'bulkOrderAccept without pending order')
+        log('warn', ('Player %s %s'):format(src, 'bulkOrderAccept without pending order'))
         return false
     end
     if not requireSaleAccess(src) then
-        warn(src, 'blocked bulkOrderAccept without sale access')
+        log('warn', ('Player %s %s'):format(src, 'blocked bulkOrderAccept without sale access'))
         return false
     end
     if not Cfg.BulkMeetupLocations or #Cfg.BulkMeetupLocations == 0 then
-        warn(src, 'bulkOrderAccept with no meetup locations configured')
+        log('warn', ('Player %s %s'):format(src, 'bulkOrderAccept with no meetup locations configured'))
         return false, 'bulk_meetup_unavailable'
     end
     order.meetup = Cfg.BulkMeetupLocations[math.random(#Cfg.BulkMeetupLocations)]
@@ -393,41 +389,41 @@ end)
 
 lib.callback.register('r_drugsales:processBulkSale', function(src, netId)
     if isOnCooldown(src, 'bulkSale', BULK_SALE_COOLDOWN_MS) then
-        warn(src, 'rate limited processBulkSale')
+        log('warn', ('Player %s %s'):format(src, 'rate limited processBulkSale'))
         return false
     end
     local order = bulkOrders[src]
     if not order then
-        warn(src, 'processBulkSale without pending order')
+        log('warn', ('Player %s %s'):format(src, 'processBulkSale without pending order'))
         return false
     end
     if not order.meetup then
-        warn(src, 'processBulkSale without assigned meetup')
+        log('warn', ('Player %s %s'):format(src, 'processBulkSale without assigned meetup'))
         return false
     end
     if not requireSaleAccess(src) then
-        warn(src, 'blocked processBulkSale without sale access')
+        log('warn', ('Player %s %s'):format(src, 'blocked processBulkSale without sale access'))
         return false
     end
     local player = GetPlayerPed(src)
     local customer = NetworkGetEntityFromNetworkId(netId)
     if not customer or not DoesEntityExist(customer) then
-        warn(src, 'processBulkSale customer does not exist')
+        log('warn', ('Player %s %s'):format(src, 'processBulkSale customer does not exist'))
         return false
     end
     local pCoords = GetEntityCoords(player)
     local cCoords = GetEntityCoords(customer)
     if #(pCoords - cCoords) > SALE_PROXIMITY then
-        warn(src, 'processBulkSale customer too far away')
+        log('warn', ('Player %s %s'):format(src, 'processBulkSale customer too far away'))
         return false
     end
     local meetupCoords = vector3(order.meetup.x, order.meetup.y, order.meetup.z)
     if #(pCoords - meetupCoords) > MEETUP_RADIUS then
-        warn(src, 'processBulkSale seller not at assigned meetup')
+        log('warn', ('Player %s %s'):format(src, 'processBulkSale seller not at assigned meetup'))
         return false
     end
     if not bridge.inventory.removeItem(src, order.item.name, order.count) then
-        warn(src, 'failed to remove items for bulk sale')
+        log('warn', ('Player %s %s'):format(src, 'failed to remove items for bulk sale'))
         return false
     end
     giveMoney(src, order.price)
@@ -438,34 +434,34 @@ end)
 
 lib.callback.register('r_drugsales:processStreetRetrieval', function(src, netId)
     if isOnCooldown(src, 'retrieval', RETRIEVAL_COOLDOWN_MS) then
-        warn(src, 'rate limited processStreetRetrieval')
+        log('warn', ('Player %s %s'):format(src, 'rate limited processStreetRetrieval'))
         return false
     end
     local identifier = bridge.framework.getPlayerIdentifier(src)
     if not identifier then
-        warn(src, 'processStreetRetrieval without identifier')
+        log('warn', ('Player %s %s'):format(src, 'processStreetRetrieval without identifier'))
         return false
     end
     local robbery = robberies[identifier]
     if not robbery then
-        warn(src, 'processStreetRetrieval without robbery record')
+        log('warn', ('Player %s %s'):format(src, 'processStreetRetrieval without robbery record'))
         return false
     end
     if robbery.netId ~= netId then
-        warn(src, 'processStreetRetrieval netId mismatch')
+        log('warn', ('Player %s %s'):format(src, 'processStreetRetrieval netId mismatch'))
         return false
     end
     local customer = NetworkGetEntityFromNetworkId(netId)
     if not customer or not DoesEntityExist(customer) or not IsEntityDead(customer) then
-        warn(src, 'processStreetRetrieval invalid robbery ped')
+        log('warn', ('Player %s %s'):format(src, 'processStreetRetrieval invalid robbery ped'))
         return false
     end
     if not isNearEntity(src, customer, SALE_PROXIMITY) then
-        warn(src, 'processStreetRetrieval ped too far away')
+        log('warn', ('Player %s %s'):format(src, 'processStreetRetrieval ped too far away'))
         return false
     end
     if not bridge.inventory.addItem(src, robbery.offer.item, robbery.offer.count) then
-        warn(src, 'failed to restore robbed items')
+        log('warn', ('Player %s %s'):format(src, 'failed to restore robbed items'))
         return false
     end
     robberies[identifier] = nil
@@ -475,7 +471,7 @@ end)
 
 lib.callback.register('r_drugsales:menuRequest', function(src)
     if isOnCooldown(src, 'menu', MENU_COOLDOWN_MS) then
-        warn(src, 'rate limited menuRequest')
+        log('warn', ('Player %s %s'):format(src, 'rate limited menuRequest'))
         return false
     end
     setCooldown(src, 'menu')
