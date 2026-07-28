@@ -1,4 +1,4 @@
-local bulkOrders = {}
+﻿local bulkOrders = {}
 local bulkCooldowns = {}
 local robberies = {}
 local streetSessions = {}
