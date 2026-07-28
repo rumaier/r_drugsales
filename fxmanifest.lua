@@ -13,15 +13,20 @@ shared_scripts {
     '@r_bridge/init.lua',
     'core/shared/*.lua',
     'locales/*.lua',
-    'config.lua',
 }
 
 server_scripts {
-    'core/server/*.lua',
+    'config.lua',
+    'core/server/_util.lua',
+    'core/server/main.lua',
 }
 
 client_scripts {
-    'core/client/*.lua',
+    'core/client/_util.lua',
+    'core/client/dispatch.lua',
+    'core/client/main.lua',
+    'core/client/street.lua',
+    'core/client/bulk.lua',
 }
 
 ui_page 'web/dist/index.html'
@@ -31,11 +36,12 @@ files {
 }
 
 dependencies {
-    'r_bridge'
+    'ox_lib',
+    'r_bridge',
 }
 
 escrow_ignore {
     'install/**/*.*',
     'locales/*.*',
-    'config.lua'    
+    'config.lua'
 }

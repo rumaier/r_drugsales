@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Group, Stack, Text } from "@mantine/core";
-import { IconAntennaBars5, IconBattery3, IconCannabisFilled, IconPackage } from "@tabler/icons-react";
+import { IconAntennaBars5, IconBattery3, IconCancel, IconCannabisFilled, IconPackage } from "@tabler/icons-react";
 import type { FC } from "react";
 import { locale } from "../../stores/locales";
 
@@ -11,14 +11,16 @@ interface GameTime {
 interface ScreenProps {
   gameTime: GameTime;
   bulkEnabled: boolean;
+  streetSelling: boolean;
   onSellHere: () => void;
+  onCancelSelling: () => void;
   onBulkOrder: () => void;
 }
 
 const formatGameTime = ({ hour, minute }: GameTime) =>
   `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 
-const Screen: FC<ScreenProps> = ({ gameTime, bulkEnabled, onSellHere, onBulkOrder }) => {
+const Screen: FC<ScreenProps> = ({ gameTime, bulkEnabled, streetSelling, onSellHere, onCancelSelling, onBulkOrder }) => {
   return (
     <Stack
       w='100%'
@@ -48,12 +50,12 @@ const Screen: FC<ScreenProps> = ({ gameTime, bulkEnabled, onSellHere, onBulkOrde
       <Button
         variant='subtle'
         justify='flex-start'
-        leftSection={<IconCannabisFilled />}
+        leftSection={streetSelling ? <IconCancel /> : <IconCannabisFilled />}
         px='xs'
-        c='dark.0'
-        onClick={onSellHere}
+        c={streetSelling ? 'red.4' : 'dark.0'}
+        onClick={streetSelling ? onCancelSelling : onSellHere}
       >
-        {locale('sell_here')}
+        {locale(streetSelling ? 'cancel_selling' : 'sell_here')}
       </Button>
       {bulkEnabled && (
         <Button

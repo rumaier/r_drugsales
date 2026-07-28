@@ -12,7 +12,7 @@ Cfg = {}
 Cfg.Language = 'en'     -- Languages: 'en': English, 'es': Spanish, 'fr': French, 'de': German, 'pt': Portuguese, 'zh': Chinese
 Cfg.NuiColor = 'violet' -- Colors: 'dark', 'gray', 'red', 'pink', 'grape', 'violet', 'indigo', 'blue', 'cyan', 'teal', 'green', 'lime', 'yellow', 'orange'
 Cfg.VersionCheck = true -- Intermittent version checking (boolean)
-Cfg.Debug = false        -- Debug prints, not recommended for live servers (boolean)
+Cfg.Debug = true        -- Debug prints, not recommended for live servers (boolean)
 
 Cfg.InteractMethod = 'item'       -- Sets the method for opening the menu ('item' or 'command')
 Cfg.InteractCommand = 'dealer'    -- The command to open the menu (only used if InteractMethod is 'command')

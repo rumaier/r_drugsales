@@ -1,6 +1,5 @@
 local onMeetup = false
-local onCooldown = false
-local currentSale = nil -- { point: lib point, blip: blip id, order: { item: item object, count: number, price: number } } 
+local currentSale = nil
 local entities = {}
 local orderInterfaceResponse = nil
 
@@ -9,14 +8,6 @@ RegisterNUICallback('orderInterfaceResponse', function(data, cb)
     orderInterfaceResponse = data
     cb(true)
 end)
-
-local function setCooldown()
-    local time = Cfg.BulkSaleCooldown * 60000
-    onCooldown = true
-    SetTimeout(time, function()
-        onCooldown = false
-    end)
-end
 
 local function setEntityForCleanup(entity)
     if not entity or not Cfg.ForceCleanup then return end
@@ -46,7 +37,7 @@ end
 local function cancelMeetup()
     releaseCustomer()
     if not currentSale then return end
-    TriggerServerEvent('r_drugsales:clearBulkOrder')
+    lib.callback.await('r_drugsales:bulkOrderDecline', false)
     bridge.natives.removeBlip(currentSale.blip)
     bridge.natives.clearGpsRoute()
     currentSale.point:remove()
@@ -81,10 +72,9 @@ local function makeExchange()
     taskExchangeAnimation()
     local netId = NetworkGetNetworkIdFromEntity(entities.customer)
     local success = lib.callback.await('r_drugsales:processBulkSale', false, netId)
-    if not success then
-        error('Failed to process bulk sale, check server console for more information')
-    else
-        bridge.interface.notify(locale('drug_sales'), locale('sale_completed', currentSale.order.count, currentSale.order.item.label, currentSale.order.price), 'success')
+    if success then
+        local itemLabel = currentSale.order.item.label or currentSale.order.item.name
+        bridge.interface.notify(locale('drug_sales'), locale('sale_completed', currentSale.order.count, itemLabel, currentSale.order.price), 'success')
         PlayPedAmbientSpeechNative(entities.customer, 'GENERIC_THANKS', 'SPEECH_PARAMS_FORCE')
         cancelMeetup()
     end
@@ -109,9 +99,9 @@ local function spawnCustomer(point)
     _debug('Customer spawned at ' .. point.coords)
 end
 
-local function startBulkSale()
-    if not currentSale then return end
-    local coords = Cfg.BulkMeetupLocations[math.random(#Cfg.BulkMeetupLocations)]
+local function startBulkSale(meetup)
+    if not currentSale or not meetup then return end
+    local coords = meetup
     local timeLimit = GetGameTimer() + Cfg.BulkMeetupTimer * 60000
     currentSale.point = lib.points.new({
         coords = coords.xyz,
@@ -161,10 +151,20 @@ local function openOrderInterface()
     SetTimeout(750, CleanupPhoneProp)
     SetNuiFocus(false, false)
     if orderInterfaceResponse == 'accept' then
+        local success, meetupOrErr = lib.callback.await('r_drugsales:bulkOrderAccept', false)
+        orderInterfaceResponse = nil
+        if not success then
+            if type(meetupOrErr) == 'string' then
+                bridge.interface.notify(locale('drug_sales'), locale(meetupOrErr), 'error')
+            end
+            lib.callback.await('r_drugsales:bulkOrderDecline', false)
+            currentSale = nil
+            return
+        end
         onMeetup = true
-        setCooldown()
-        startBulkSale()
+        startBulkSale(meetupOrErr)
     else
+        lib.callback.await('r_drugsales:bulkOrderDecline', false)
         onMeetup = false
         currentSale = nil
         orderInterfaceResponse = nil
@@ -177,15 +177,21 @@ function InitBulkOrder(cb)
         bridge.interface.notify(locale('drug_sales'), locale('already_selling'), 'error')
         return cb and cb(false)
     end
-    if onCooldown then
+    local items, order, err = lib.callback.await('r_drugsales:bulkOrderRequest', false)
+    if err == 'bulk_sale_cooldown' then
         bridge.interface.notify(locale('drug_sales'), locale('bulk_cooldown', Cfg.BulkSaleCooldown), 'error')
         return cb and cb(false)
     end
-    local items, order = lib.callback.await('r_drugsales:bulkOrderRequest', false)
-    if #items == 0 or not order then
+    if err == 'bulk_sales_disabled' then
+        bridge.interface.notify(locale('drug_sales'), locale('bulk_sales_disabled'), 'error')
+        return cb and cb(false)
+    end
+    if err == 'no_drugs' or #items == 0 or not order then
         bridge.interface.notify(locale('drug_sales'), locale('no_drugs'), 'error')
         return cb and cb(false)
     end
+    local itemInfo = bridge.inventory.getItemInfo(order.item.name)
+    order.item.label = (itemInfo and itemInfo.label) or order.item.name
     currentSale = { order = order }
     if cb then cb(true) end
     openOrderInterface()

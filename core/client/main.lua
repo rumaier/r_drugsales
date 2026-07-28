@@ -24,7 +24,7 @@ end)
 RegisterNetEvent('r_drugsales:openMenu', function()
     local access, err = lib.callback.await('r_drugsales:menuRequest', false)
     if not access and not err then
-        error('Failed to open menu, check server console for more information.')
+        return
     elseif not access and err then
         bridge.interface.notify(locale('drug_sales'), locale(err), 'error')
     else
@@ -33,7 +33,7 @@ RegisterNetEvent('r_drugsales:openMenu', function()
         bridge.natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_in', 750, 16, 0.0)
         Wait(750)
         bridge.natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_read_base', -1, 17, 0.0)
-        SendNUIMessage({ action = 'openMenu' })
+        SendNUIMessage({ action = 'openMenu', data = { streetSelling = IsStreetSelling() } })
         SetNuiFocus(true, true)
     end
 end)

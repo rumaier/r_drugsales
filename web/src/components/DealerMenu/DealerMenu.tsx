@@ -19,14 +19,16 @@ const DealerMenu: FC = () => {
   const playSound = useSoundStore.getState().play;
   const bulkEnabled = useConfigStore.getState().BulkSalesEnabled;
   const [visible, setVisible] = useState<boolean>(false);
+  const [streetSelling, setStreetSelling] = useState<boolean>(false);
   const [gameTime, setGameTime] = useState<GameTime>({ hour: 0, minute: 0 });
 
   const getGameTime = () => fetchNui<GameTime>('getGameTime').then((time) => {
     setGameTime(time);
   });
 
-  useNuiEvent('openMenu', () => {
+  useNuiEvent<{ streetSelling?: boolean }>('openMenu', (data) => {
     setVisible(true);
+    setStreetSelling(data?.streetSelling ?? false);
     getGameTime();
   });
 
@@ -72,6 +74,15 @@ const DealerMenu: FC = () => {
     })
   };
 
+  const handleCancelSelling = () => {
+    playSound('keypress', 0.025);
+    fetchNui('cancelStreetSale').then(() => {
+      fetchNui('onMenuClose');
+      setStreetSelling(false);
+      setVisible(false);
+    });
+  };
+
   const handleBulkOrder = () => {
     playSound('keypress', 0.025);
     fetchNui('initBulkOrder').then((success) => {
@@ -113,7 +124,9 @@ const DealerMenu: FC = () => {
             <Screen
               gameTime={gameTime}
               bulkEnabled={bulkEnabled}
+              streetSelling={streetSelling}
               onSellHere={handleSellHere}
+              onCancelSelling={handleCancelSelling}
               onBulkOrder={handleBulkOrder}
             />
             <Keypad />

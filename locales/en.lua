@@ -5,6 +5,7 @@ Language['en'] = {
     
     drug_sales = 'Drug Sales',
     sell_here = 'Sell Here',
+    cancel_selling = 'Cancel Selling',
     bulk_order = 'Bulk Order',
     offer_drugs = 'Offer Drugs',
     retrieve_drugs = 'Retrieve Drugs',
@@ -18,7 +19,9 @@ Language['en'] = {
     cant_in_vehicle = 'You cannot sell drugs while in a vehicle!',
     no_drugs = 'You don\'t have enough drugs to sell!',
     wait_for_customer = 'Wait for a customer to approach you...',
+    no_customers_found = 'No customers nearby — try another area to sell.',
     sale_abandoned = 'You abandoned the sale!',
+    sale_cancelled = 'Street selling cancelled.',
     took_too_long = 'You took too long, the customer left!',
     offer_rejected = 'The customer rejected your offer!',
     sale_completed = 'You sold %s %s for $%s!',
@@ -26,6 +29,8 @@ Language['en'] = {
     robber_escaped = 'The robber escaped!',
     robber_caught = 'You caught the robber!',
     bulk_cooldown = 'You must wait %s minutes between bulk sales!',
+    bulk_sales_disabled = 'Bulk sales are currently disabled!',
+    bulk_meetup_unavailable = 'No meetup locations are available right now!',
     head_to_meetup = 'Head to the meetup location to complete the sale!',
 
     item = 'Item',

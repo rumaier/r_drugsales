@@ -1,11 +1,29 @@
 local zones = {}
 local entities = {}
 local isSelling = false
-local canSell = not Cfg.EnableZones
+local canSell = false
 local offerInterfaceResponse = nil
 
+local function refreshCanSell()
+    if not Cfg.EnableZones then
+        canSell = true
+        return
+    end
+    if not Cfg.Zones then
+        canSell = false
+        return
+    end
+    local inside = isPointInZones(GetEntityCoords(cache.ped), Cfg.Zones)
+    if Cfg.ZoneBehavior == 'whitelist' then
+        canSell = inside
+    else
+        canSell = not inside
+    end
+    _debug('canSell: ' .. tostring(canSell))
+end
+
 RegisterNUICallback('offerInterfaceResponse', function(data, cb)
-    _debug('response: ' .. tostring(data))
+    _debug('response: ' .. json.encode(data))
     offerInterfaceResponse = data
     cb(true)
 end)
@@ -65,7 +83,9 @@ local function getNearestPed(coords)
         end
     end
     if not ped then return false end
-    TriggerServerEvent('r_drugsales:setPedAsCustomer', NetworkGetNetworkIdFromEntity(ped))
+    local netId = NetworkGetNetworkIdFromEntity(ped)
+    local registered = lib.callback.await('r_drugsales:registerStreetCustomer', false, netId)
+    if not registered then return false end
     SetEntityAsMissionEntity(ped, true, true)
     return ped
 end
@@ -108,9 +128,7 @@ local function retrieveDrugs(self)
     entities.drugs = nil
     local netId = NetworkGetNetworkIdFromEntity(self.entity)
     local success = lib.callback.await('r_drugsales:processStreetRetrieval', false, netId)
-    if not success then
-        error('Failed to process retrieval, check server console for more information')
-    else
+    if success then
         bridge.interface.notify(locale('drug_sales'), locale('robber_caught'), 'success')
         cancelSale()
     end
@@ -140,35 +158,24 @@ local function taskChaseCustomer()
     end
 end
 
-local function taskCustomerRobPlayer(offer)
+local function taskCustomerRobPlayer()
     taskExchangeAnimation(true)
-    local netId = NetworkGetNetworkIdFromEntity(entities.customer)
-    local success = lib.callback.await('r_drugsales:processStreetRobbery', false, netId, offer)
-    if not success then
-        error('Failed to process robbery, check server console for more information')
-    else
-        bridge.interface.notify(locale('drug_sales'), locale('sale_robbed'), 'error')
-        SetPedAsEnemy(entities.customer, true)
-        SetPedHasAiBlip(entities.customer, true)
-        PlayPedAmbientSpeechNative(entities.customer, 'GENERIC_INSULT_HIGH', 'SPEECH_PARAMS_FORCE')
-        TaskSmartFleePed(entities.customer, cache.ped, 100.0, -1, false, false)
-        taskChaseCustomer()
-    end
+    bridge.interface.notify(locale('drug_sales'), locale('sale_robbed'), 'error')
+    SetPedAsEnemy(entities.customer, true)
+    SetPedHasAiBlip(entities.customer, true)
+    PlayPedAmbientSpeechNative(entities.customer, 'GENERIC_INSULT_HIGH', 'SPEECH_PARAMS_FORCE')
+    TaskSmartFleePed(entities.customer, cache.ped, 100.0, -1, false, false)
+    taskChaseCustomer()
 end
 
-local function taskAcceptedOffer(offer)
-    local netId = NetworkGetNetworkIdFromEntity(entities.customer)
+local function taskAcceptedOffer(offer, payout)
     StopAnimTask(cache.ped, 'anim@amb@casino@hangout@ped_male@stand@03b@idles_convo', 'idle_d', 1.0)
     taskExchangeAnimation()
-    local success = lib.callback.await('r_drugsales:processStreetSale', false, netId, offer)
-    if not success then
-        error('Failed to process sale, check server console for more information')
-    else
-        local itemLabel = bridge.inventory.getItemInfo(offer.item).label
-        bridge.interface.notify(locale('drug_sales'), locale('sale_completed', offer.count, itemLabel, offer.price * offer.count), 'success')
-        PlayPedAmbientSpeechNative(entities.customer, 'GENERIC_THANKS', 'SPEECH_PARAMS_FORCE')
-        restartStreetSale()
-    end
+    local itemInfo = bridge.inventory.getItemInfo(offer.item)
+    local itemLabel = (itemInfo and itemInfo.label) or offer.item
+    bridge.interface.notify(locale('drug_sales'), locale('sale_completed', offer.count, itemLabel, payout), 'success')
+    PlayPedAmbientSpeechNative(entities.customer, 'GENERIC_THANKS', 'SPEECH_PARAMS_FORCE')
+    restartStreetSale()
 end
 
 local function taskRejectedOffer()
@@ -182,27 +189,16 @@ local function taskRejectedOffer()
     restartStreetSale()
 end
 
-local function getAcceptOdds(offer)
-    local max = Cfg.DrugItems[offer.item].street.maxPrice
-    local odds = math.floor(((max - offer.price + 1) / max) * 100) / 100
-    _debug('accept odds: ' .. tostring(odds))
-    return odds
-end
-
-local function offerDrugs(offer)
-    local roll = math.random()
-    _debug('roll: ' .. tostring(roll))
-    if roll <= getAcceptOdds(offer) then
-        _debug('customer accepted offer')
-        taskAcceptedOffer(offer)
+local function resolveOffer(offer)
+    local netId = NetworkGetNetworkIdFromEntity(entities.customer)
+    local success, result = lib.callback.await('r_drugsales:resolveStreetOffer', false, netId, offer)
+    if not success or not result then return end
+    if result.outcome == 'accept' then
+        taskAcceptedOffer(result.offer, result.payout)
+    elseif result.outcome == 'robbery' then
+        taskCustomerRobPlayer()
     else
-        if math.random() <= Cfg.StreetRobberyChance / 100 then
-            _debug('customer is robbing player')
-            taskCustomerRobPlayer(offer)
-        else
-            _debug('customer rejected offer')
-            taskRejectedOffer()
-        end
+        taskRejectedOffer()
     end
 end
 
@@ -247,7 +243,7 @@ local function openOfferInterface()
         releaseCustomer()
         restartStreetSale()
     else
-        offerDrugs(offerInterfaceResponse)
+        resolveOffer(offerInterfaceResponse)
     end
 end
 
@@ -331,17 +327,34 @@ local function startStreetSale()
             local coords = GetOffsetFromEntityInWorldCoords(cache.ped, 0.0, 25.0, 0.0)
             local heading = GetEntityHeading(cache.ped) + 180.0
             entities.customer = bridge.natives.createPed(models[math.random(#models)], coords, heading, true)
+            local netId = NetworkGetNetworkIdFromEntity(entities.customer)
+            if not lib.callback.await('r_drugsales:registerStreetCustomer', false, netId) then
+                bridge.interface.notify(locale('drug_sales'), locale('no_customers_found'), 'error')
+                return cancelSale()
+            end
             _debug('spawned customer: ' .. tostring(entities.customer))
         end
         taskCustomerApproachPlayer(homePos)
     end)
 end
 
+function IsStreetSelling()
+    return isSelling
+end
+
+function CancelStreetSale()
+    if not isSelling then return end
+    cancelSale()
+    bridge.interface.notify(locale('drug_sales'), locale('sale_cancelled'), 'info')
+end
+
 ---@param cb fun(success: boolean)?
 function InitStreetSale(cb)
     if isSelling then
-        bridge.interface.notify(locale('drug_sales'), locale('already_selling'), 'error')
-        cancelSale()
+        return cb and cb(false)
+    end
+    refreshCanSell()
+    if Cfg.EnableZones == nil then
         return cb and cb(false)
     end
     local zoneBehavior = Cfg.ZoneBehavior
@@ -368,32 +381,48 @@ RegisterNUICallback('initStreetSale', function(_, cb)
     InitStreetSale(cb)
 end)
 
-local function onZoneEnter()
-    canSell = Cfg.ZoneBehavior == 'whitelist'
-    _debug('canSell: ' .. tostring(canSell))
-end
-
-local function onZoneExit()
-    canSell = Cfg.ZoneBehavior == 'blacklist'
-    _debug('canSell: ' .. tostring(canSell))
-end
+RegisterNUICallback('cancelStreetSale', function(_, cb)
+    CancelStreetSale()
+    cb(true)
+end)
 
 local function initZones()
-    if not Cfg.EnableZones then return end
+    if not Cfg.EnableZones then
+        refreshCanSell()
+        return
+    end
     for _, zone in pairs(Cfg.Zones) do
         table.insert(zones, lib.zones.poly({
             points = zone,
             thickness = 100.0,
             debug = Cfg.Debug,
-            onEnter = onZoneEnter,
-            onExit = onZoneExit
+            onEnter = refreshCanSell,
+            onExit = refreshCanSell,
         }))
     end
+    refreshCanSell()
     _debug('Initialized ' .. #zones .. ' zones')
 end
 
-AddEventHandler('r_bridge:playerLoaded', function()
+local function tryInitZones()
+    if not Cfg.EnableZones then
+        refreshCanSell()
+        return
+    end
+    if #zones > 0 then return end
+    if not Cfg.Zones then return end
     initZones()
+end
+
+AddEventHandler('r_drugsales:clientConfigLoaded', tryInitZones)
+
+AddEventHandler('r_bridge:playerLoaded', function()
+    tryInitZones()
+end)
+
+CreateThread(function()
+    Wait(500)
+    tryInitZones()
 end)
 
 AddEventHandler('onResourceStop', function(resource)
