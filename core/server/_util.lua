@@ -16,7 +16,7 @@ AddEventHandler('onResourceStart', function(name)
     else
         print('^1' .. locale('update_bridge') .. '^0')
     end
-    if Cfg and Cfg.Debug then log('warn', locale('debug_enabled')) end
+    if Cfg and Cfg.Debug then print('^1' .. locale('debug_enabled') .. '^0') end
     print('------------------------------')
     checkVersion()
 end)
