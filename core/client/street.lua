@@ -414,11 +414,12 @@ local function tryInitZones()
     initZones()
 end
 
-AddEventHandler('r_drugsales:clientConfigLoaded', tryInitZones)
-
-AddEventHandler('r_bridge:playerLoaded', function()
+AddEventHandler('r_drugsales:clientConfigLoaded', function()
+    if not bridge.framework.isPlayerLoaded() then return end
     tryInitZones()
 end)
+
+AddEventHandler('r_bridge:playerLoaded', tryInitZones)
 
 CreateThread(function()
     Wait(500)
