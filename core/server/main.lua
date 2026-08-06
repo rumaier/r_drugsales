@@ -1,9 +1,7 @@
 local bulkOrders = {}
-local bulkCooldowns = {}
 local robberies = {}
 local streetSessions = {}
 local customerPedOwners = {}
-local cooldowns = {}
 
 local SALE_PROXIMITY = 5.0
 local MEETUP_RADIUS = 25.0
@@ -14,19 +12,7 @@ local BULK_REQUEST_COOLDOWN_MS = 1000
 local BULK_SALE_COOLDOWN_MS = 500
 local RETRIEVAL_COOLDOWN_MS = 500
 local GET_DRUGS_COOLDOWN_MS = 500
-
-local function getCooldownKey(src, action)
-    return ('%s:%s'):format(src, action)
-end
-
-local function isOnCooldown(src, action, duration)
-    local last = cooldowns[getCooldownKey(src, action)]
-    return last and GetGameTimer() - last < duration
-end
-
-local function setCooldown(src, action)
-    cooldowns[getCooldownKey(src, action)] = GetGameTimer()
-end
+local BULK_COOLDOWN_MS = (Cfg.BulkSaleCooldown or 0) * 60000
 
 local function clearPlayerState(src)
     local session = streetSessions[src]
@@ -35,12 +21,6 @@ local function clearPlayerState(src)
         streetSessions[src] = nil
     end
     bulkOrders[src] = nil
-    bulkCooldowns[src] = nil
-    for key in pairs(cooldowns) do
-        if key:match('^' .. src .. ':') then
-            cooldowns[key] = nil
-        end
-    end
 end
 
 local function getPlayerCoords(src)
@@ -149,11 +129,6 @@ local function isNearEntity(src, entity, maxDistance)
     return #(GetEntityCoords(player) - GetEntityCoords(entity)) <= maxDistance
 end
 
-local function isBulkOnCooldown(src)
-    local untilTime = bulkCooldowns[src]
-    return untilTime and os.time() < untilTime
-end
-
 local function getBulkEligibleDrugs(src)
     local eligible = {}
     for itemName, drugCfg in pairs(Cfg.DrugItems or {}) do
@@ -166,10 +141,6 @@ local function getBulkEligibleDrugs(src)
         end
     end
     return eligible
-end
-
-local function setBulkCooldown(src)
-    bulkCooldowns[src] = os.time() + ((Cfg.BulkSaleCooldown or 0) * 60)
 end
 
 lib.callback.register('r_drugsales:getClientConfig', function()
@@ -204,11 +175,11 @@ lib.callback.register('r_drugsales:getClientConfig', function()
 end)
 
 lib.callback.register('r_drugsales:getPlayerDrugs', function(src)
-    if isOnCooldown(src, 'getDrugs', GET_DRUGS_COOLDOWN_MS) then
+    if IsOnCooldown(src, 'getDrugs', GET_DRUGS_COOLDOWN_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited getPlayerDrugs'))
         return {}
     end
-    setCooldown(src, 'getDrugs')
+    SetCooldown(src, 'getDrugs')
     if not requireSaleAccess(src) then
         log('warn', ('Player %s %s'):format(src, 'blocked getPlayerDrugs without sale access'))
         return {}
@@ -217,7 +188,7 @@ lib.callback.register('r_drugsales:getPlayerDrugs', function(src)
 end)
 
 lib.callback.register('r_drugsales:registerStreetCustomer', function(src, netId)
-    if isOnCooldown(src, 'registerCustomer', STREET_OFFER_COOLDOWN_MS) then
+    if IsOnCooldown(src, 'registerCustomer', STREET_OFFER_COOLDOWN_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited registerStreetCustomer'))
         return false
     end
@@ -253,12 +224,12 @@ lib.callback.register('r_drugsales:registerStreetCustomer', function(src, netId)
     streetSessions[src] = { netId = netId, startedAt = os.time() }
     customerPedOwners[netId] = src
     Entity(customer).state:set('drugCustomer', true, true)
-    setCooldown(src, 'registerCustomer')
+    SetCooldown(src, 'registerCustomer')
     return true
 end)
 
 lib.callback.register('r_drugsales:resolveStreetOffer', function(src, netId, offer)
-    if isOnCooldown(src, 'streetOffer', STREET_OFFER_COOLDOWN_MS) then
+    if IsOnCooldown(src, 'streetOffer', STREET_OFFER_COOLDOWN_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited resolveStreetOffer'))
         return false
     end
@@ -285,7 +256,7 @@ lib.callback.register('r_drugsales:resolveStreetOffer', function(src, netId, off
         log('warn', ('Player %s %s'):format(src, 'resolveStreetOffer customer too far away'))
         return false
     end
-    setCooldown(src, 'streetOffer')
+    SetCooldown(src, 'streetOffer')
 
     local acceptOdds = getAcceptOdds(validatedOffer.item, validatedOffer.price)
     local roll = math.random()
@@ -330,7 +301,7 @@ lib.callback.register('r_drugsales:resolveStreetOffer', function(src, netId, off
 end)
 
 lib.callback.register('r_drugsales:bulkOrderRequest', function(src)
-    if isOnCooldown(src, 'bulkRequest', BULK_REQUEST_COOLDOWN_MS) then
+    if IsOnCooldown(src, 'bulkRequest', BULK_REQUEST_COOLDOWN_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited bulkOrderRequest'))
         return {}, false
     end
@@ -341,10 +312,10 @@ lib.callback.register('r_drugsales:bulkOrderRequest', function(src)
         log('warn', ('Player %s %s'):format(src, 'blocked bulkOrderRequest without sale access'))
         return {}, false
     end
-    if isBulkOnCooldown(src) then
+    if IsOnCooldown(src, 'bulk', BULK_COOLDOWN_MS) then
         return {}, false, 'bulk_sale_cooldown'
     end
-    setCooldown(src, 'bulkRequest')
+    SetCooldown(src, 'bulkRequest')
 
     local items = getBulkEligibleDrugs(src)
     if #items == 0 then return items, false, 'no_drugs' end
@@ -376,7 +347,7 @@ lib.callback.register('r_drugsales:bulkOrderAccept', function(src)
         return false, 'bulk_meetup_unavailable'
     end
     order.meetup = Cfg.BulkMeetupLocations[math.random(#Cfg.BulkMeetupLocations)]
-    setBulkCooldown(src)
+    SetCooldown(src, 'bulk')
     return true, order.meetup
 end)
 
@@ -388,7 +359,7 @@ lib.callback.register('r_drugsales:bulkOrderDecline', function(src)
 end)
 
 lib.callback.register('r_drugsales:processBulkSale', function(src, netId)
-    if isOnCooldown(src, 'bulkSale', BULK_SALE_COOLDOWN_MS) then
+    if IsOnCooldown(src, 'bulkSale', BULK_SALE_COOLDOWN_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited processBulkSale'))
         return false
     end
@@ -428,12 +399,12 @@ lib.callback.register('r_drugsales:processBulkSale', function(src, netId)
     end
     giveMoney(src, order.price)
     bulkOrders[src] = nil
-    setCooldown(src, 'bulkSale')
+    SetCooldown(src, 'bulkSale')
     return true
 end)
 
 lib.callback.register('r_drugsales:processStreetRetrieval', function(src, netId)
-    if isOnCooldown(src, 'retrieval', RETRIEVAL_COOLDOWN_MS) then
+    if IsOnCooldown(src, 'retrieval', RETRIEVAL_COOLDOWN_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited processStreetRetrieval'))
         return false
     end
@@ -465,16 +436,16 @@ lib.callback.register('r_drugsales:processStreetRetrieval', function(src, netId)
         return false
     end
     robberies[identifier] = nil
-    setCooldown(src, 'retrieval')
+    SetCooldown(src, 'retrieval')
     return true
 end)
 
 lib.callback.register('r_drugsales:menuRequest', function(src)
-    if isOnCooldown(src, 'menu', MENU_COOLDOWN_MS) then
+    if IsOnCooldown(src, 'menu', MENU_COOLDOWN_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited menuRequest'))
         return false
     end
-    setCooldown(src, 'menu')
+    SetCooldown(src, 'menu')
     local job = bridge.framework.getPlayerJob(src) or {}
     if lib.table.contains(Cfg.PoliceJobs, job.name) then
         return false, 'no_police_allowed'

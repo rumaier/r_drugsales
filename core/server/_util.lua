@@ -1,5 +1,15 @@
 local resource = GetCurrentResourceName()
 local version = GetResourceMetadata(resource, 'version', 0)
+local cooldowns = {}
+
+function IsOnCooldown(src, action, duration)
+    local last = cooldowns[('%s:%s'):format(src, action)]
+    return last and GetGameTimer() - last < duration
+end
+
+function SetCooldown(src, action)
+    cooldowns[('%s:%s'):format(src, action)] = GetGameTimer()
+end
 
 local function checkVersion()
     if not Cfg.VersionCheck then return end
@@ -19,4 +29,12 @@ AddEventHandler('onResourceStart', function(name)
     if Cfg and Cfg.Debug then print('^1' .. locale('debug_enabled') .. '^0') end
     print('------------------------------')
     checkVersion()
+end)
+
+AddEventHandler('playerDropped', function()
+    local src = source
+    local prefix = '^' .. src .. ':'
+    for key in pairs(cooldowns) do
+        if key:match(prefix) then cooldowns[key] = nil end
+    end
 end)
