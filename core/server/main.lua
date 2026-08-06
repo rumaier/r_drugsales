@@ -6,12 +6,12 @@ local customerPedOwners = {}
 local SALE_PROXIMITY = 5.0
 local MEETUP_RADIUS = 25.0
 local CUSTOMER_REGISTER_BUFFER = 5.0
-local MENU_COOLDOWN_MS = 1000
-local STREET_OFFER_COOLDOWN_MS = 500
-local BULK_REQUEST_COOLDOWN_MS = 1000
-local BULK_SALE_COOLDOWN_MS = 500
-local RETRIEVAL_COOLDOWN_MS = 500
-local GET_DRUGS_COOLDOWN_MS = 500
+local MENU_RATE_LIMIT_MS = 1000
+local STREET_OFFER_RATE_LIMIT_MS = 500
+local BULK_REQUEST_RATE_LIMIT_MS = 1000
+local BULK_SALE_RATE_LIMIT_MS = 500
+local RETRIEVAL_RATE_LIMIT_MS = 500
+local GET_DRUGS_RATE_LIMIT_MS = 500
 local BULK_COOLDOWN_MS = (Cfg.BulkSaleCooldown or 0) * 60000
 
 local function clearPlayerState(src)
@@ -86,19 +86,6 @@ local function getPlayerDrugs(src)
     return drugs
 end
 
-local function copyDrugItemsForClient(drugItems)
-    local copied = {}
-    for name, data in pairs(drugItems or {}) do
-        copied[name] = {
-            street = {
-                maxOffer = data.street.maxOffer,
-                maxPrice = data.street.maxPrice,
-            },
-        }
-    end
-    return copied
-end
-
 local function getAcceptOdds(itemName, price)
     local cfg = Cfg.DrugItems[itemName].street
     local max = cfg.maxPrice
@@ -143,43 +130,12 @@ local function getBulkEligibleDrugs(src)
     return eligible
 end
 
-lib.callback.register('r_drugsales:getClientConfig', function()
-    return {
-        Language = Cfg.Language,
-        NuiColor = Cfg.NuiColor,
-        Debug = Cfg.Debug,
-        BulkSalesEnabled = Cfg.BulkSalesEnabled,
-        DrugItems = copyDrugItemsForClient(Cfg.DrugItems),
-        EnableZones = Cfg.EnableZones,
-        ZoneBehavior = Cfg.ZoneBehavior,
-        Zones = Cfg.Zones,
-        StreetPedMethod = Cfg.StreetPedMethod,
-        StreetPedFrequency = Cfg.StreetPedFrequency,
-        StreetFetchDistance = Cfg.StreetFetchDistance,
-        StreetPedWalkSpeed = Cfg.StreetPedWalkSpeed,
-        StreetAbandonDistance = Cfg.StreetAbandonDistance,
-        StreetDispatchOdds = Cfg.StreetDispatchOdds,
-        StreetRobberyChance = Cfg.StreetRobberyChance,
-        StreetPedModels = Cfg.StreetPedModels,
-        BulkPedModels = Cfg.BulkPedModels,
-        BulkMeetupTimer = Cfg.BulkMeetupTimer,
-        BulkSaleCooldown = Cfg.BulkSaleCooldown,
-        ForceCleanup = Cfg.ForceCleanup,
-        InteractMethod = Cfg.InteractMethod,
-        InteractItem = Cfg.InteractItem,
-        InteractCommand = Cfg.InteractCommand,
-        DispatchResource = Cfg.DispatchResource,
-        PoliceJobs = Cfg.PoliceJobs,
-        VersionCheck = Cfg.VersionCheck,
-    }
-end)
-
 lib.callback.register('r_drugsales:getPlayerDrugs', function(src)
-    if IsOnCooldown(src, 'getDrugs', GET_DRUGS_COOLDOWN_MS) then
+    if IsRateLimited(src, 'getDrugs', GET_DRUGS_RATE_LIMIT_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited getPlayerDrugs'))
         return {}
     end
-    SetCooldown(src, 'getDrugs')
+    SetRateLimit(src, 'getDrugs')
     if not requireSaleAccess(src) then
         log('warn', ('Player %s %s'):format(src, 'blocked getPlayerDrugs without sale access'))
         return {}
@@ -188,7 +144,7 @@ lib.callback.register('r_drugsales:getPlayerDrugs', function(src)
 end)
 
 lib.callback.register('r_drugsales:registerStreetCustomer', function(src, netId)
-    if IsOnCooldown(src, 'registerCustomer', STREET_OFFER_COOLDOWN_MS) then
+    if IsRateLimited(src, 'registerCustomer', STREET_OFFER_RATE_LIMIT_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited registerStreetCustomer'))
         return false
     end
@@ -224,12 +180,12 @@ lib.callback.register('r_drugsales:registerStreetCustomer', function(src, netId)
     streetSessions[src] = { netId = netId, startedAt = os.time() }
     customerPedOwners[netId] = src
     Entity(customer).state:set('drugCustomer', true, true)
-    SetCooldown(src, 'registerCustomer')
+    SetRateLimit(src, 'registerCustomer')
     return true
 end)
 
 lib.callback.register('r_drugsales:resolveStreetOffer', function(src, netId, offer)
-    if IsOnCooldown(src, 'streetOffer', STREET_OFFER_COOLDOWN_MS) then
+    if IsRateLimited(src, 'streetOffer', STREET_OFFER_RATE_LIMIT_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited resolveStreetOffer'))
         return false
     end
@@ -256,7 +212,7 @@ lib.callback.register('r_drugsales:resolveStreetOffer', function(src, netId, off
         log('warn', ('Player %s %s'):format(src, 'resolveStreetOffer customer too far away'))
         return false
     end
-    SetCooldown(src, 'streetOffer')
+    SetRateLimit(src, 'streetOffer')
 
     local acceptOdds = getAcceptOdds(validatedOffer.item, validatedOffer.price)
     local roll = math.random()
@@ -301,7 +257,7 @@ lib.callback.register('r_drugsales:resolveStreetOffer', function(src, netId, off
 end)
 
 lib.callback.register('r_drugsales:bulkOrderRequest', function(src)
-    if IsOnCooldown(src, 'bulkRequest', BULK_REQUEST_COOLDOWN_MS) then
+    if IsRateLimited(src, 'bulkRequest', BULK_REQUEST_RATE_LIMIT_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited bulkOrderRequest'))
         return {}, false
     end
@@ -315,7 +271,7 @@ lib.callback.register('r_drugsales:bulkOrderRequest', function(src)
     if IsOnCooldown(src, 'bulk', BULK_COOLDOWN_MS) then
         return {}, false, 'bulk_sale_cooldown'
     end
-    SetCooldown(src, 'bulkRequest')
+    SetRateLimit(src, 'bulkRequest')
 
     local items = getBulkEligibleDrugs(src)
     if #items == 0 then return items, false, 'no_drugs' end
@@ -359,7 +315,7 @@ lib.callback.register('r_drugsales:bulkOrderDecline', function(src)
 end)
 
 lib.callback.register('r_drugsales:processBulkSale', function(src, netId)
-    if IsOnCooldown(src, 'bulkSale', BULK_SALE_COOLDOWN_MS) then
+    if IsRateLimited(src, 'bulkSale', BULK_SALE_RATE_LIMIT_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited processBulkSale'))
         return false
     end
@@ -399,12 +355,12 @@ lib.callback.register('r_drugsales:processBulkSale', function(src, netId)
     end
     giveMoney(src, order.price)
     bulkOrders[src] = nil
-    SetCooldown(src, 'bulkSale')
+    SetRateLimit(src, 'bulkSale')
     return true
 end)
 
 lib.callback.register('r_drugsales:processStreetRetrieval', function(src, netId)
-    if IsOnCooldown(src, 'retrieval', RETRIEVAL_COOLDOWN_MS) then
+    if IsRateLimited(src, 'retrieval', RETRIEVAL_RATE_LIMIT_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited processStreetRetrieval'))
         return false
     end
@@ -436,16 +392,16 @@ lib.callback.register('r_drugsales:processStreetRetrieval', function(src, netId)
         return false
     end
     robberies[identifier] = nil
-    SetCooldown(src, 'retrieval')
+    SetRateLimit(src, 'retrieval')
     return true
 end)
 
 lib.callback.register('r_drugsales:menuRequest', function(src)
-    if IsOnCooldown(src, 'menu', MENU_COOLDOWN_MS) then
+    if IsRateLimited(src, 'menu', MENU_RATE_LIMIT_MS) then
         log('warn', ('Player %s %s'):format(src, 'rate limited menuRequest'))
         return false
     end
-    SetCooldown(src, 'menu')
+    SetRateLimit(src, 'menu')
     local job = bridge.framework.getPlayerJob(src) or {}
     if lib.table.contains(Cfg.PoliceJobs, job.name) then
         return false, 'no_police_allowed'
