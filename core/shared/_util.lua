@@ -3,7 +3,7 @@ Cfg = Cfg or {}
 local LOG = {
     debug = { color = 6, tag = 'DEBUG', enabled = true },
     warn = { color = 3, tag = 'WARN', enabled = true },
-    error = { color = 8, tag = 'ERROR', enabled = true },
+    error = { color = 1, tag = 'ERROR', enabled = true },
 }
 
 Language = Language or {}
