@@ -1,38 +1,47 @@
 ---@diagnostic disable: undefined-global
-
 fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
 name 'r_drugsales'
-description 'A Simple Drug Selling Script'
+description 'A Simple Drug Selling Script for FiveM'
 author 'rumaier'
-version '3.1.0'
+version '3.2.0'
 
 shared_scripts {
-  '@ox_lib/init.lua',
-  'utils/shared.lua',
-  'locales/*.lua',
-  'configs/*.lua'
+    '@ox_lib/init.lua',
+    '@r_bridge/init.lua',
+    'core/shared/*.lua',
+    'locales/*.lua',
 }
 
 server_scripts {
-  'utils/server.lua',
-  'core/server/*.lua',
+    'config.lua',
+    'core/server/_util.lua',
+    'core/server/main.lua',
 }
 
 client_scripts {
-  'utils/client.lua',
-  'core/client/*.lua',
+    'core/client/_util.lua',
+    'core/client/dispatch.lua',
+    'core/client/main.lua',
+    'core/client/street.lua',
+    'core/client/bulk.lua',
 }
 
-ui_page 'nui/build/index.html'
+ui_page 'web/dist/index.html'
 files {
-  'nui/build/index.html',
-  'nui/build/**/*'
+    'web/dist/index.html',
+    'web/dist/**/*',
 }
 
 dependencies {
-  'ox_lib',
-  'r_bridge',
+    'ox_lib',
+    'r_bridge',
+}
+
+escrow_ignore {
+    'install/**/*.*',
+    'locales/*.*',
+    'config.lua'
 }

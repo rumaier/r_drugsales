@@ -1,69 +1,48 @@
-local phone = { model = 'prop_prologue_phone', entity = nil }
+local PHONE_MODEL = 'prop_prologue_phone'
 
-RegisterNUICallback('triggerStreetSell', function(_, cb)
-    if IsStreetSelling() then
-        Core.Interface.notify(_L('notify_title'), _L('already_selling'), 'error')
-        cb(false)
-        return
-    end
-    local started = InitializeStreetSale()
-    cb(started)
-end)
+local phoneProp = nil
 
-RegisterNUICallback('triggerBulkOrder', function(_, cb)
-    if IsBulkSelling() then
-        Core.Interface.notify(_L('notify_title'), _L('already_selling'), 'error')
-        cb(false)
-        return
-    end
-    if IsBulkOnCooldown() then
-        Core.Interface.notify(_L('notify_title'), _L('on_cooldown', Cfg.Options.BulkCooldown), 'error')
-        cb(false)
-        return
-    end
-    local started = InitializeBulkSale()
-    cb(started)
-end)
+function CleanupPhoneProp()
+    if not phoneProp then return end
+    DeleteEntity(phoneProp)
+    phoneProp = nil
+end
 
 RegisterNUICallback('getGameTime', function(_, cb)
-    local hour = GetClockHours()
-    local minute = GetClockMinutes()
-    cb({ hour = hour, minute = minute })
+    cb({ hour = GetClockHours(), minute = GetClockMinutes() })
 end)
 
-function CleanupPhone()
-    if not phone.entity then return end
-    DeleteEntity(phone.entity)
-    phone.entity = nil
-end
-
-RegisterNUICallback('cleanupPhone', function(_, cb)
+RegisterNUICallback('onMenuClose', function(_, cb)
     cb(true)
-    Core.Natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_out', 750, 16, 0.0)
-    SetTimeout(750, CleanupPhone)
+    bridge.natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_out', 750, 16, 0.0)
+    Wait(750)
+    SetNuiFocus(false, false)
+    DeleteEntity(phoneProp or 0)
+    phoneProp = nil
 end)
 
-local function triggerPhoneAnimation()
-    phone.entity = Core.Natives.createObject(phone.model, vec3(0, 0, 0), 0, true)
-    repeat Wait(0) until DoesEntityExist(phone.entity)
-    AttachEntityToEntity(phone.entity, cache.ped, 90, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
-    Core.Natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_in', 750, 16, 0.0)
-    SetTimeout(750, function()
-        Core.Natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_read_base', -1, 17, 0.0)
-    end)
-end
-
-local function openMenu()
-    local isPolice = lib.callback.await('r_drugsales:isPlayerPolice', false)
-    local policeCount = lib.callback.await('r_drugsales:getPoliceCount', false)
-    if isPolice then Core.Interface.notify(_L('notify_title'), _L('police_cant_sell'), 'error') return end
-    if policeCount < Cfg.Options.MinimumPolice then Core.Interface.notify(_L('notify_title'), _L('not_enough_police'), 'error') return end
-    triggerPhoneAnimation()
-    SetTimeout(750, function()
-        _debug('[^6DEBUG^0] - Opening dealer menu')
-        SendNUIMessage({ action = 'openDealerMenu' })
+RegisterNetEvent('r_drugsales:openMenu', function()
+    local access, err = lib.callback.await('r_drugsales:menuRequest', false)
+    if not access and not err then
+        return
+    elseif not access and err then
+        bridge.interface.notify(locale('drug_sales'), locale(err), 'error')
+    else
+        phoneProp = bridge.natives.createObject(PHONE_MODEL, vec3(0, 0, 0), 0, true)
+        AttachEntityToEntity(phoneProp, cache.ped, 90, 0, 0, 0, 0, 0, 0, false, false, false, false, 2, true)
+        bridge.natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_in', 750, 16, 0.0)
+        Wait(750)
+        bridge.natives.playAnimation(cache.ped, 'cellphone@', 'cellphone_text_read_base', -1, 17, 0.0)
+        SendNUIMessage({ action = 'openMenu', data = { streetSelling = IsStreetSelling() } })
         SetNuiFocus(true, true)
-    end)
-end
+    end
+end)
 
-RegisterNetEvent('r_drugsales:openMenu', openMenu)
+AddEventHandler('onResourceStop', function(resource)
+    if resource ~= GetCurrentResourceName() then return end
+    if phoneProp then
+        ClearPedTasks(cache.ped)
+        DeleteEntity(phoneProp)
+        SetNuiFocus(false, false)
+    end
+end)

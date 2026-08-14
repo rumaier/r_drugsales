@@ -1,59 +1,51 @@
 Language = Language or {}
-Language['en'] = { -- English
-
-    -- Targets
-    offer_drugs = 'Offer Drugs',
-    robbery_target = 'Retrieve Stolen Drugs',
-    make_exchange = 'Make Exchange',
-
-    -- Notifications
-    notify_title = 'Drug Selling',
-    police_cant_sell = 'Police officers cannot sell drugs.',
-    not_enough_police = 'Not enough police online to sell drugs.',
-    cant_in_vehicle = 'You cannot sell drugs while in a vehicle.',
-    not_in_zone = 'You cannot sell drugs here.',
-    not_enough_drugs = 'You do not have enough drugs to sell.',
-    already_selling = 'You are already selling drugs.',
-    abandoned_sale = 'You abandoned the sale.',
-    wait_for_customers = 'Wait for customers to approach you...',
-    no_customers_found = 'No customers in the area, go somewhere else.',
-    sale_finished = 'You sold %sx %s for $%s.',
-    sale_denied = 'Your offer was denied.',
-    sale_robbed = 'They robbed you, get them!',
-    robber_escaped = 'The robber escaped, you lost the drugs.',
-    robber_caught = 'You retrieved your drugs.',
-    on_cooldown = 'You must wait %s minutes before looking for another bulk order.',
-    head_to_meetup = 'Head to the meetup location.',
-    meetup_missed = 'You missed the meetup, the buyer has left.',
-    took_too_long = 'You took too long, the customer has left.',
-
-    -- UI Elements
+Language['en'] = {
+    
+    command_help = 'Open the drug sales menu',
+    
+    drug_sales = 'Drug Sales',
     sell_here = 'Sell Here',
-    bulk_order = 'Find Bulk Order',
-    select_drug = 'Select Drug',
-    selected = 'Selected',
-    amount = 'Amount',
+    cancel_selling = 'Cancel Selling',
+    bulk_order = 'Bulk Order',
+    offer_drugs = 'Offer Drugs',
+    retrieve_drugs = 'Retrieve Drugs',
+    meetup_location = 'Meetup Location',
+    make_exchange = 'Make Exchange',
+    
+    no_police_allowed = 'Police are not allowed to sell drugs!',
+    not_enough_police = 'Not enough police on duty to sell drugs!',
+    already_selling = 'You are already selling drugs!',
+    not_in_zone = 'You are not in an area where you can sell drugs!',
+    cant_in_vehicle = 'You cannot sell drugs while in a vehicle!',
+    no_drugs = 'You don\'t have enough drugs to sell!',
+    wait_for_customer = 'Wait for a customer to approach you...',
+    no_customers_found = 'No customers nearby — try another area to sell.',
+    sale_abandoned = 'You abandoned the sale!',
+    sale_cancelled = 'Street selling cancelled.',
+    took_too_long = 'You took too long, the customer left!',
+    offer_rejected = 'The customer rejected your offer!',
+    sale_completed = 'You sold %s %s for $%s!',
+    sale_robbed = 'The customer robbed you!',
+    robber_escaped = 'The robber escaped!',
+    robber_caught = 'You caught the robber!',
+    bulk_cooldown = 'You must wait %s minutes between bulk sales!',
+    bulk_sales_disabled = 'Bulk sales are currently disabled!',
+    bulk_meetup_unavailable = 'No meetup locations are available right now!',
+    head_to_meetup = 'Head to the meetup location to complete the sale!',
+
+    item = 'Item',
+    count = 'Count',
     price = 'Price',
     cancel = 'Cancel',
-    confirm = 'Confirm',
-    accept = 'Accept',
     offer = 'Offer',
-
     dialing = 'Dialing',
-    bulk_request = 'Customer is looking for %sx %s for $%s, accept?',
-    meetup_location = 'Meetup Location',
+    decline = 'Decline',
+    accept = 'Accept',
 
-    command_help = 'Open the drug dealer menu',
-
-    -- Webhook
-    player_id = 'Player ID',
-    username = 'Username',
-    identifier = 'Identifier',
-
-    -- Console
-    resource_version = '%s | v%s',
-    bridge_detected = '^2Bridge detected and loaded.^0',
-    bridge_not_detected = '^1Bridge not detected, please ensure it is running.^0',
-    cheater_print = 'You tried to outsmart the system. The system outsmarted you.',
-    debug_enabled = '^1Debug mode is ON! Do NOT run this in production!^0',
+    item_required = 'Item is required',
+    bulk_order_body = 'Customer is looking for %sx %s for $%s',
+    
+    bridge_loaded = 'Bridge loaded successfully.',
+    update_bridge = 'Please update r_bridge to v3.0.0 or higher!',
+    debug_enabled = 'Debug mode is ON! Do NOT run this in production!',
 }

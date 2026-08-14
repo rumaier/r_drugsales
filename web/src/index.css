@@ -1,0 +1,14 @@
+:root, html {
+  color-scheme: normal;
+  font-size: clamp(1rem, calc(0.0625rem + 1.389vh), 1.3125rem);
+}
+
+body {
+  height: 100vh;
+  background: transparent;
+  overflow: hidden;
+}
+
+*:focus {
+  outline: none;
+}

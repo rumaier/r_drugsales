@@ -1,113 +1,438 @@
+local bulkOrders = {}
 local robberies = {}
+local streetSessions = {}
+local customerPedOwners = {}
 
-lib.callback.register('r_drugsales:processBulkSale', function(src, customerNetId, offer)
-    local customerEntity = NetworkGetEntityFromNetworkId(customerNetId)
-    if not customerEntity or not DoesEntityExist(customerEntity) then return false end
-    local playerEntity = GetPlayerPed(src)
-    local playerCoords = GetEntityCoords(playerEntity)
-    local customerCoords = GetEntityCoords(customerEntity)
-    if #(playerCoords - customerCoords) > 10.0 then return false, _debug('[^1ERROR^0] - Player ' .. src .. ' is too far from customer to complete sale') end
-    local removed = Core.Inventory.removeItem(src, offer.drug, offer.amount)
-    if not removed then return false, _debug('[^1ERROR^0] - Failed to remove drug item from player ' .. src) end
-    if Cfg.Options.CurrencyType == 'account' then
-        Core.Framework.addAccountBalance(src, Cfg.Options.CurrencyName, offer.price)
-    else
-        Core.Inventory.addItem(src, Cfg.Options.CurrencyName, offer.price)
+local SALE_PROXIMITY = 5.0
+local MEETUP_RADIUS = 25.0
+local CUSTOMER_REGISTER_BUFFER = 5.0
+local MENU_RATE_LIMIT_MS = 1000
+local STREET_OFFER_RATE_LIMIT_MS = 500
+local BULK_REQUEST_RATE_LIMIT_MS = 1000
+local BULK_SALE_RATE_LIMIT_MS = 500
+local RETRIEVAL_RATE_LIMIT_MS = 500
+local GET_DRUGS_RATE_LIMIT_MS = 500
+local BULK_COOLDOWN_MS = (Cfg.BulkSaleCooldown or 0) * 60000
+
+local function clearPlayerState(src)
+    local session = streetSessions[src]
+    if session then
+        customerPedOwners[session.netId] = nil
+        streetSessions[src] = nil
     end
-    return true
-end)
-
-lib.callback.register('r_drugsales:processRobbery', function(src, customerNetId, offer)
-    local removed = Core.Inventory.removeItem(src, offer.drug, offer.amount)
-    if not removed then return false, _debug('[^1ERROR^0] - Failed to remove drug item from player ' .. src) end
-    local identifier = Core.Framework.getPlayerIdentifier(src)
-    if not identifier then return false, _debug('[^1ERROR^0] - Failed to get identifier for player ' .. src) end
-    robberies[identifier] = { customerNetId = customerNetId, offer = offer }
-    return true
-end)
-
-lib.callback.register('r_drugsales:retrieveStolenDrugs', function(src, customerNetId)
-    local identifier = Core.Framework.getPlayerIdentifier(src)
-    if not identifier then return false, _debug('[^1ERROR^0] - Failed to get identifier for player ' .. src) end
-    local robbery = robberies[identifier]
-    if not robbery then return false, _debug('[^1ERROR^0] - No robbery data found for player ' .. src) end
-    if robbery.customerNetId ~= customerNetId then return false, _debug('[^1ERROR^0] - Customer net ID does not match for player ' .. src) end
-    local customerEntity = NetworkGetEntityFromNetworkId(customerNetId)
-    if not customerEntity or not DoesEntityExist(customerEntity) then return false, _debug('[^1ERROR^0] - Customer entity does not exist for player ' .. src) end
-    local playerEntity = GetPlayerPed(src)
-    local playerCoords = GetEntityCoords(playerEntity)
-    local customerCoords = GetEntityCoords(customerEntity)
-    if #(playerCoords - customerCoords) > 10.0 then return false, _debug('[^1ERROR^0] - Player ' .. src .. ' is too far from customer to retrieve drugs') end
-    local added = Core.Inventory.addItem(src, robbery.offer.drug, robbery.offer.amount)
-    if not added then return false, _debug('[^1ERROR^0] - Failed to add drug item back to player ' .. src) end
-    robberies[identifier] = nil
-    return true
-end)
-
-lib.callback.register('r_drugsales:processStreetSale', function(src, customerNetId, offer)
-    local customerEntity = NetworkGetEntityFromNetworkId(customerNetId)
-    if not customerEntity or not DoesEntityExist(customerEntity) then return false end
-    local playerEntity = GetPlayerPed(src)
-    local playerCoords = GetEntityCoords(playerEntity)
-    local customerCoords = GetEntityCoords(customerEntity)
-    if #(playerCoords - customerCoords) > 10.0 then return false, _debug('[^1ERROR^0] - Player ' .. src .. ' is too far from customer to complete sale') end
-    local removed = Core.Inventory.removeItem(src, offer.drug, offer.amount)
-    if not removed then return false, _debug('[^1ERROR^0] - Failed to remove drug item from player ' .. src) end
-    if Cfg.Options.CurrencyType == 'account' then
-        Core.Framework.addAccountBalance(src, Cfg.Options.CurrencyName, offer.price)
-    else
-        Core.Inventory.addItem(src, Cfg.Options.CurrencyName, offer.price)
-    end
-    return true
-end)
-
-RegisterNetEvent('r_drugsales:setPedAsCustomer', function(netId)
-    local entity = NetworkGetEntityFromNetworkId(netId)
-    if not entity or not DoesEntityExist(entity) then return end
-    Entity(entity).state:set('drug_customer', true, true)
-end)
-
-local function isPlayerPolice(src)
-    local policeJobs = Cfg.Options.PoliceJobs
-    local playerJob = Core.Framework.getPlayerJob(src)
-    return lib.table.contains(policeJobs, playerJob.name)
+    bulkOrders[src] = nil
 end
 
-lib.callback.register('r_drugsales:isPlayerPolice', isPlayerPolice)
+local function getPlayerCoords(src)
+    local ped = GetPlayerPed(src)
+    if not ped or ped == 0 then return end
+    return GetEntityCoords(ped)
+end
 
-lib.callback.register('r_drugsales:getPoliceCount', function()
+local function getPoliceCount()
     local count = 0
-    local players = GetPlayers()
-    for _, id in pairs(players) do
-        if isPlayerPolice(id) then count = count + 1 end
+    for _, id in pairs(GetPlayers()) do
+        local playerId = tonumber(id)
+        if playerId then
+            local job = bridge.framework.getPlayerJob(playerId) or {}
+            if lib.table.contains(Cfg.PoliceJobs, job.name) then
+                count = count + 1
+            end
+        end
     end
     return count
-end)
-
-lib.callback.register('r_drugsales:getPlayerInventory', function(src)
-    local inventory = Core.Inventory.getPlayerInventory(src)
-    return inventory
-end)
-
-local function registerUsablePhoneItem()
-    if Cfg.Options.Interaction ~= 'item' then return end
-    Core.Framework.registerUsableItem(Cfg.Options.InteractItem, function(src)
-        print(('[^5r_drugsales^0] Player %s used dealer phone item'):format(src))
-        TriggerClientEvent('r_drugsales:openMenu', src)
-    end)
 end
 
-local function registerInteractCommand()
-    if Cfg.Options.Interaction ~= 'command' then return end
-    lib.addCommand(Cfg.Options.InteractCommand, {
-        help = _L('command_help')
-    }, function(src)
-        TriggerClientEvent('r_drugsales:openMenu', src)
-    end)
+local function requireSaleAccess(src)
+    local job = bridge.framework.getPlayerJob(src) or {}
+    if lib.table.contains(Cfg.PoliceJobs, job.name) then
+        return false
+    end
+    local minPolice = Cfg.MinPoliceRequired
+    if minPolice and getPoliceCount() < minPolice then
+        return false
+    end
+    return true
 end
+
+local function isPlayerInSellZone(src)
+    if not Cfg.EnableZones then return true end
+    local coords = getPlayerCoords(src)
+    if not coords then return false end
+    local inside = isPointInZones(coords, Cfg.Zones)
+    if Cfg.ZoneBehavior == 'whitelist' then
+        return inside
+    end
+    return not inside
+end
+
+local function giveMoney(src, amount)
+    local currency = Cfg.Currency
+    if Cfg.CurrencyType == 'item' then
+        bridge.inventory.addItem(src, currency, amount)
+    else
+        bridge.framework.addBalance(src, currency, amount)
+    end
+end
+
+local function getPlayerDrugs(src)
+    local drugs = {}
+    local inventory = bridge.inventory.getInventory(src) or {}
+    for _, item in pairs(inventory) do
+        if Cfg.DrugItems[item.name] then
+            table.insert(drugs, item)
+        end
+    end
+    return drugs
+end
+
+local function getAcceptOdds(itemName, price)
+    local cfg = Cfg.DrugItems[itemName].street
+    local max = cfg.maxPrice
+    return math.floor(((max - price + 1) / max) * 100) / 100
+end
+
+local function validateStreetOffer(src, offer)
+    if type(offer) ~= 'table' then return end
+    local itemName = offer.item
+    local count = offer.count
+    local price = offer.price
+    if type(itemName) ~= 'string' then return end
+    if type(count) ~= 'number' or count ~= math.floor(count) or count < 1 then return end
+    if type(price) ~= 'number' or price ~= math.floor(price) or price < 1 then return end
+    local drugCfg = Cfg.DrugItems[itemName]
+    if not drugCfg or not drugCfg.street then return end
+    if count > drugCfg.street.maxOffer then return end
+    if price > drugCfg.street.maxPrice then return end
+    local owned = bridge.inventory.getItemCount(src, itemName) or 0
+    if count > owned then return end
+    return { item = itemName, count = count, price = price }
+end
+
+local function isNearEntity(src, entity, maxDistance)
+    local player = GetPlayerPed(src)
+    if not player or player == 0 then return false end
+    if not entity or not DoesEntityExist(entity) then return false end
+    return #(GetEntityCoords(player) - GetEntityCoords(entity)) <= maxDistance
+end
+
+local function getBulkEligibleDrugs(src)
+    local eligible = {}
+    for itemName, drugCfg in pairs(Cfg.DrugItems or {}) do
+        local bulkCfg = drugCfg.bulk
+        if bulkCfg then
+            local total = bridge.inventory.getItemCount(src, itemName) or 0
+            if total >= bulkCfg.minRequest then
+                table.insert(eligible, { name = itemName, count = total })
+            end
+        end
+    end
+    return eligible
+end
+
+lib.callback.register('r_drugsales:getPlayerDrugs', function(src)
+    if IsRateLimited(src, 'getDrugs', GET_DRUGS_RATE_LIMIT_MS) then
+        log('warn', ('Player %s %s'):format(src, 'rate limited getPlayerDrugs'))
+        return {}
+    end
+    SetRateLimit(src, 'getDrugs')
+    if not requireSaleAccess(src) then
+        log('warn', ('Player %s %s'):format(src, 'blocked getPlayerDrugs without sale access'))
+        return {}
+    end
+    return getPlayerDrugs(src)
+end)
+
+lib.callback.register('r_drugsales:registerStreetCustomer', function(src, netId)
+    if IsRateLimited(src, 'registerCustomer', STREET_OFFER_RATE_LIMIT_MS) then
+        log('warn', ('Player %s %s'):format(src, 'rate limited registerStreetCustomer'))
+        return false
+    end
+    if not requireSaleAccess(src) then
+        log('warn', ('Player %s %s'):format(src, 'blocked registerStreetCustomer without sale access'))
+        return false
+    end
+    if not isPlayerInSellZone(src) then
+        log('warn', ('Player %s %s'):format(src, 'blocked registerStreetCustomer outside sell zone'))
+        return false
+    end
+    if type(netId) ~= 'number' then
+        log('warn', ('Player %s %s'):format(src, 'invalid netId for registerStreetCustomer'))
+        return false
+    end
+    if customerPedOwners[netId] and customerPedOwners[netId] ~= src then
+        log('warn', ('Player %s %s'):format(src, 'attempted to register customer already owned by another player'))
+        return false
+    end
+    local customer = NetworkGetEntityFromNetworkId(netId)
+    if not customer or not DoesEntityExist(customer) then
+        log('warn', ('Player %s %s'):format(src, 'attempted to register non-existent customer ped'))
+        return false
+    end
+    local maxDistance = (Cfg.StreetFetchDistance or 25.0) + CUSTOMER_REGISTER_BUFFER
+    if not isNearEntity(src, customer, maxDistance) then
+        log('warn', ('Player %s %s'):format(src, 'attempted to register customer ped too far away'))
+        return false
+    end
+    if streetSessions[src] then
+        customerPedOwners[streetSessions[src].netId] = nil
+    end
+    streetSessions[src] = { netId = netId, startedAt = os.time() }
+    customerPedOwners[netId] = src
+    Entity(customer).state:set('drugCustomer', true, true)
+    SetRateLimit(src, 'registerCustomer')
+    return true
+end)
+
+lib.callback.register('r_drugsales:resolveStreetOffer', function(src, netId, offer)
+    if IsRateLimited(src, 'streetOffer', STREET_OFFER_RATE_LIMIT_MS) then
+        log('warn', ('Player %s %s'):format(src, 'rate limited resolveStreetOffer'))
+        return false
+    end
+    if not requireSaleAccess(src) then
+        log('warn', ('Player %s %s'):format(src, 'blocked resolveStreetOffer without sale access'))
+        return false
+    end
+    if not isPlayerInSellZone(src) then
+        log('warn', ('Player %s %s'):format(src, 'blocked resolveStreetOffer outside sell zone'))
+        return false
+    end
+    local session = streetSessions[src]
+    if not session or session.netId ~= netId then
+        log('warn', ('Player %s %s'):format(src, 'resolveStreetOffer without matching street session'))
+        return false
+    end
+    local validatedOffer = validateStreetOffer(src, offer)
+    if not validatedOffer then
+        log('warn', ('Player %s %s'):format(src, 'invalid street offer payload'))
+        return false
+    end
+    local customer = NetworkGetEntityFromNetworkId(netId)
+    if not isNearEntity(src, customer, SALE_PROXIMITY) then
+        log('warn', ('Player %s %s'):format(src, 'resolveStreetOffer customer too far away'))
+        return false
+    end
+    SetRateLimit(src, 'streetOffer')
+
+    local acceptOdds = getAcceptOdds(validatedOffer.item, validatedOffer.price)
+    local roll = math.random()
+    if roll <= acceptOdds then
+        if not bridge.inventory.removeItem(src, validatedOffer.item, validatedOffer.count) then
+            log('warn', ('Player %s %s'):format(src, 'failed to remove items for accepted street sale'))
+            return false
+        end
+        local payout = validatedOffer.price * validatedOffer.count
+        giveMoney(src, payout)
+        return true, {
+            outcome = 'accept',
+            offer = validatedOffer,
+            payout = payout,
+        }
+    end
+
+    if math.random() <= (Cfg.StreetRobberyChance / 100) then
+        if not bridge.inventory.removeItem(src, validatedOffer.item, validatedOffer.count) then
+            log('warn', ('Player %s %s'):format(src, 'failed to remove items for street robbery'))
+            return false
+        end
+        local identifier = bridge.framework.getPlayerIdentifier(src)
+        if not identifier then
+            log('warn', ('Player %s %s'):format(src, 'failed to get identifier for street robbery'))
+            return false
+        end
+        robberies[identifier] = {
+            netId = netId,
+            offer = validatedOffer,
+        }
+        return true, {
+            outcome = 'robbery',
+            offer = validatedOffer,
+        }
+    end
+
+    return true, {
+        outcome = 'reject',
+        offer = validatedOffer,
+    }
+end)
+
+lib.callback.register('r_drugsales:bulkOrderRequest', function(src)
+    if IsRateLimited(src, 'bulkRequest', BULK_REQUEST_RATE_LIMIT_MS) then
+        log('warn', ('Player %s %s'):format(src, 'rate limited bulkOrderRequest'))
+        return {}, false
+    end
+    if not Cfg.BulkSalesEnabled then
+        return {}, false, 'bulk_sales_disabled'
+    end
+    if not requireSaleAccess(src) then
+        log('warn', ('Player %s %s'):format(src, 'blocked bulkOrderRequest without sale access'))
+        return {}, false
+    end
+    if IsOnCooldown(src, 'bulk', BULK_COOLDOWN_MS) then
+        return {}, false, 'bulk_sale_cooldown'
+    end
+    SetRateLimit(src, 'bulkRequest')
+
+    local items = getBulkEligibleDrugs(src)
+    if #items == 0 then return items, false, 'no_drugs' end
+
+    local item = items[math.random(#items)]
+    local cfg = Cfg.DrugItems[item.name].bulk
+    local count = math.random(cfg.minRequest, math.min(cfg.maxRequest, item.count))
+    local price = math.random(cfg.minPrice, cfg.maxPrice) * count
+    bulkOrders[src] = {
+        item = { name = item.name },
+        count = count,
+        price = price,
+    }
+    return items, bulkOrders[src]
+end)
+
+lib.callback.register('r_drugsales:bulkOrderAccept', function(src)
+    local order = bulkOrders[src]
+    if not order then
+        log('warn', ('Player %s %s'):format(src, 'bulkOrderAccept without pending order'))
+        return false
+    end
+    if not requireSaleAccess(src) then
+        log('warn', ('Player %s %s'):format(src, 'blocked bulkOrderAccept without sale access'))
+        return false
+    end
+    if not Cfg.BulkMeetupLocations or #Cfg.BulkMeetupLocations == 0 then
+        log('warn', ('Player %s %s'):format(src, 'bulkOrderAccept with no meetup locations configured'))
+        return false, 'bulk_meetup_unavailable'
+    end
+    order.meetup = Cfg.BulkMeetupLocations[math.random(#Cfg.BulkMeetupLocations)]
+    SetCooldown(src, 'bulk')
+    return true, order.meetup
+end)
+
+lib.callback.register('r_drugsales:bulkOrderDecline', function(src)
+    if bulkOrders[src] then
+        bulkOrders[src] = nil
+    end
+    return true
+end)
+
+lib.callback.register('r_drugsales:processBulkSale', function(src, netId)
+    if IsRateLimited(src, 'bulkSale', BULK_SALE_RATE_LIMIT_MS) then
+        log('warn', ('Player %s %s'):format(src, 'rate limited processBulkSale'))
+        return false
+    end
+    local order = bulkOrders[src]
+    if not order then
+        log('warn', ('Player %s %s'):format(src, 'processBulkSale without pending order'))
+        return false
+    end
+    if not order.meetup then
+        log('warn', ('Player %s %s'):format(src, 'processBulkSale without assigned meetup'))
+        return false
+    end
+    if not requireSaleAccess(src) then
+        log('warn', ('Player %s %s'):format(src, 'blocked processBulkSale without sale access'))
+        return false
+    end
+    local player = GetPlayerPed(src)
+    local customer = NetworkGetEntityFromNetworkId(netId)
+    if not customer or not DoesEntityExist(customer) then
+        log('warn', ('Player %s %s'):format(src, 'processBulkSale customer does not exist'))
+        return false
+    end
+    local pCoords = GetEntityCoords(player)
+    local cCoords = GetEntityCoords(customer)
+    if #(pCoords - cCoords) > SALE_PROXIMITY then
+        log('warn', ('Player %s %s'):format(src, 'processBulkSale customer too far away'))
+        return false
+    end
+    local meetupCoords = vector3(order.meetup.x, order.meetup.y, order.meetup.z)
+    if #(pCoords - meetupCoords) > MEETUP_RADIUS then
+        log('warn', ('Player %s %s'):format(src, 'processBulkSale seller not at assigned meetup'))
+        return false
+    end
+    if not bridge.inventory.removeItem(src, order.item.name, order.count) then
+        log('warn', ('Player %s %s'):format(src, 'failed to remove items for bulk sale'))
+        return false
+    end
+    giveMoney(src, order.price)
+    bulkOrders[src] = nil
+    SetRateLimit(src, 'bulkSale')
+    return true
+end)
+
+lib.callback.register('r_drugsales:processStreetRetrieval', function(src, netId)
+    if IsRateLimited(src, 'retrieval', RETRIEVAL_RATE_LIMIT_MS) then
+        log('warn', ('Player %s %s'):format(src, 'rate limited processStreetRetrieval'))
+        return false
+    end
+    local identifier = bridge.framework.getPlayerIdentifier(src)
+    if not identifier then
+        log('warn', ('Player %s %s'):format(src, 'processStreetRetrieval without identifier'))
+        return false
+    end
+    local robbery = robberies[identifier]
+    if not robbery then
+        log('warn', ('Player %s %s'):format(src, 'processStreetRetrieval without robbery record'))
+        return false
+    end
+    if robbery.netId ~= netId then
+        log('warn', ('Player %s %s'):format(src, 'processStreetRetrieval netId mismatch'))
+        return false
+    end
+    local customer = NetworkGetEntityFromNetworkId(netId)
+    if not customer or not DoesEntityExist(customer) or not IsEntityDead(customer) then
+        log('warn', ('Player %s %s'):format(src, 'processStreetRetrieval invalid robbery ped'))
+        return false
+    end
+    if not isNearEntity(src, customer, SALE_PROXIMITY) then
+        log('warn', ('Player %s %s'):format(src, 'processStreetRetrieval ped too far away'))
+        return false
+    end
+    if not bridge.inventory.addItem(src, robbery.offer.item, robbery.offer.count) then
+        log('warn', ('Player %s %s'):format(src, 'failed to restore robbed items'))
+        return false
+    end
+    robberies[identifier] = nil
+    SetRateLimit(src, 'retrieval')
+    return true
+end)
+
+lib.callback.register('r_drugsales:menuRequest', function(src)
+    if IsRateLimited(src, 'menu', MENU_RATE_LIMIT_MS) then
+        log('warn', ('Player %s %s'):format(src, 'rate limited menuRequest'))
+        return false
+    end
+    SetRateLimit(src, 'menu')
+    local job = bridge.framework.getPlayerJob(src) or {}
+    if lib.table.contains(Cfg.PoliceJobs, job.name) then
+        return false, 'no_police_allowed'
+    end
+    local minPolice = Cfg.MinPoliceRequired
+    if minPolice and getPoliceCount() < minPolice then
+        return false, 'not_enough_police'
+    end
+    return true
+end)
+
+local function registerInteractMethod()
+    local method = Cfg.InteractMethod
+    if method == 'item' then
+        bridge.framework.registerUsableItem(Cfg.InteractItem, function(src)
+            TriggerClientEvent('r_drugsales:openMenu', src)
+        end)
+    elseif method == 'command' then
+        lib.addCommand(Cfg.InteractCommand, { help = locale('command_help') }, function(src)
+            TriggerClientEvent('r_drugsales:openMenu', src)
+        end)
+    else
+        error('Invalid interact method: ' .. method)
+    end
+end
+
+AddEventHandler('playerDropped', function()
+    clearPlayerState(source)
+end)
 
 AddEventHandler('onResourceStart', function(resource)
     if resource ~= GetCurrentResourceName() then return end
-    registerUsablePhoneItem()
-    registerInteractCommand()
+    registerInteractMethod()
 end)
